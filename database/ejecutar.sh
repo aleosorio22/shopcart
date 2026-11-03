@@ -26,7 +26,7 @@ cd "$(dirname "$0")/scripts"
 : "${API_PASSWORD:?Falta API_PASSWORD}" "${JOBS_PASSWORD:?Falta JOBS_PASSWORD}"
 
 LOG="$(mktemp -t shopcart-migracion)"
-sq() { sqlcmd -S "$DB_SERVIDOR" -U "$DB_USUARIO" -C -b -I -f 65001 "$@"; }
+sq() { sqlcmd -S "$DB_SERVIDOR" -U "$DB_USUARIO" -C -b -I "$@"; }
 
 aplicado() {
   sq -d master -h -1 -W -Q "SET NOCOUNT ON; IF DB_ID('ShopCart') IS NOT NULL AND OBJECT_ID('ShopCart.Config.VersionEsquema') IS NOT NULL SELECT COUNT(*) FROM ShopCart.Config.VersionEsquema WHERE Script = '$1' ELSE SELECT 0;" | tr -d '[:space:]'
@@ -35,10 +35,13 @@ aplicado() {
 for archivo in 0*.sql; do
   [ "$archivo" = "015_Pruebas.sql" ] && continue
   [[ "${archivo:0:3}" < "$DESDE" ]] && continue
-  if [ "$(aplicado "$archivo")" != "0" ]; then
-    echo "omitido  $archivo"
-    continue
-  fi
+  # Una consulta fallida debe detener todo: nunca debe confundirse con un script ya aplicado.
+  estado="$(aplicado "$archivo")" || { echo "No se pudo consultar el servidor"; exit 1; }
+  case "$estado" in
+    0) ;;
+    1) echo "omitido  $archivo"; continue ;;
+    *) echo "Respuesta inesperada del servidor: $estado"; exit 1 ;;
+  esac
   echo "aplicando $archivo"
   sq -d master -i "$archivo" -v API_PASSWORD="$API_PASSWORD" -v JOBS_PASSWORD="$JOBS_PASSWORD" >>"$LOG" 2>&1 || { tail -20 "$LOG"; exit 1; }
   sq -d ShopCart -Q "INSERT Config.VersionEsquema (Script) VALUES ('$archivo');" >>"$LOG"
