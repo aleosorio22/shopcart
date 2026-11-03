@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const id = z.coerce.number().int().positive();
 export const idParam = z.object({ id });
+export const correo = z.string().trim().toLowerCase().max(254).pipe(z.email());
 export const dinero = z.number().nonnegative().multipleOf(0.01);
 export const fecha = z.iso.date();
 export const fechaHora = z.iso.datetime();

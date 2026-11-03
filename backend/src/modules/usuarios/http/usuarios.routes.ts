@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { booleanoQuery, idParam, paginado, textoCorto } from '../../../core/http/esquemas.js';
+import { booleanoQuery, correo, idParam, paginado, textoCorto } from '../../../core/http/esquemas.js';
 import { ruta, type RutaDefinida } from '../../../core/http/route.js';
 import type { UsuariosService } from '../application/usuarios.service.js';
 import { ROLES } from '../domain/usuarios.ports.js';
@@ -8,7 +8,7 @@ const PERMISO = 'USUARIOS_GESTIONAR';
 
 const filtro = paginado.extend({ texto: z.string().max(100).optional(), rol: z.enum(ROLES).optional(), activo: booleanoQuery.optional() });
 const nuevo = z.object({
-  correo: z.string().trim().toLowerCase().pipe(z.email()).max(254),
+  correo,
   contrasena: z.string().min(10).max(72),
   nombres: textoCorto(100),
   apellidos: textoCorto(100),

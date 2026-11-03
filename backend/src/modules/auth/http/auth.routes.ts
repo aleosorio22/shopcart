@@ -1,7 +1,7 @@
 import type { CookieOptions, Request, RequestHandler, Response } from 'express';
 import { z } from 'zod';
 import { AppError } from '../../../core/errors/app-error.js';
-import { textoCorto } from '../../../core/http/esquemas.js';
+import { correo, textoCorto } from '../../../core/http/esquemas.js';
 import { ruta, type RutaDefinida } from '../../../core/http/route.js';
 import { COOKIE_INVITADO, leerHashInvitado } from '../../../core/http/cookies.js';
 import type { AuthService } from '../application/auth.service.js';
@@ -10,7 +10,6 @@ import type { MetaSesion, Sesion } from '../domain/auth.ports.js';
 const COOKIE_REFRESH = 'sc_refresh';
 const BYTES_MAXIMOS_BCRYPT = 72;
 
-const correo = z.string().trim().toLowerCase().pipe(z.email()).max(254);
 const contrasenaNueva = z
   .string()
   .min(10, 'Minimo 10 caracteres')
