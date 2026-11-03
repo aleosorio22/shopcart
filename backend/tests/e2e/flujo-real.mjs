@@ -8,7 +8,8 @@ let fallas = 0;
 let aciertos = 0;
 
 function comprobar(nombre, condicion, detalle = '') {
-  condicion ? (aciertos += 1) : (fallas += 1);
+  if (condicion) aciertos += 1;
+  else fallas += 1;
   console.log(`${condicion ? 'OK   ' : 'FALLA'} ${nombre}${condicion ? '' : `  -> ${JSON.stringify(detalle)}`}`);
 }
 
