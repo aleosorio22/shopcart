@@ -133,4 +133,4 @@ export JOBS_PASSWORD="..."
 ./ejecutar.sh --pruebas
 ```
 
-Requiere `sqlcmd`. Usuarios de prueba: `admin@`, `operador@`, `cliente1@`, `cliente2@` y `cliente3@shopcart.test`, todos con contraseña `ShopCart#2026`.
+Si instalas a mano, ejecuta del `001` al `014` y luego el `016`, que agrega procedimientos para el backend; `015_Pruebas.sql` va al final. Requiere `sqlcmd`. Usuarios de prueba: `admin@`, `operador@`, `cliente1@`, `cliente2@` y `cliente3@shopcart.test`, todos con contraseña `ShopCart#2026`.

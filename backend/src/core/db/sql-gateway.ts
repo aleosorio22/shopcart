@@ -59,6 +59,6 @@ export interface Pagina<T = Fila> {
 /** Los SP de listado devuelven TotalRegistros en cada fila; aqui se convierte en metadato. */
 export function aPagina(filas: Fila[], { pagina, tamanoPagina }: Paginacion): Pagina {
   const total = Number(filas[0]?.TotalRegistros ?? 0);
-  const limpias = filas.map(({ TotalRegistros: _omitido, ...resto }) => resto);
+  const limpias = filas.map((fila) => Object.fromEntries(Object.entries(fila).filter(([columna]) => columna !== 'TotalRegistros')));
   return { filas: limpias, total, pagina, tamanoPagina };
 }
