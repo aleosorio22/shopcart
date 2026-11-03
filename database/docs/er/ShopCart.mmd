@@ -1,0 +1,634 @@
+erDiagram
+  Config_Parametro {
+    varchar Clave PK
+    nvarchar Valor
+    varchar TipoDato
+    nvarchar Descripcion
+    datetime2 ActualizadoEn
+  }
+  Config_ErrorNegocio {
+    int Codigo PK
+    varchar CodigoNegocio UK
+    nvarchar Mensaje
+    smallint HttpStatus
+  }
+  Seguridad_Rol {
+    smallint IDRol PK
+    varchar Codigo UK
+    nvarchar Nombre
+  }
+  Seguridad_Permiso {
+    smallint IDPermiso PK
+    varchar Codigo UK
+    nvarchar Descripcion
+  }
+  Seguridad_RolPermiso {
+    smallint IDRol PK, FK
+    smallint IDPermiso PK, FK
+  }
+  Seguridad_Usuario {
+    int IDUsuario PK
+    nvarchar Correo UK
+    varchar HashContrasena
+    nvarchar Nombres
+    nvarchar Apellidos
+    varchar Telefono
+    smallint IDRol FK
+    bit Activo
+    tinyint IntentosFallidos
+    datetime2 BloqueadoHasta
+    datetime2 UltimoAcceso
+    datetime2 CreadoEn
+    datetime2 ActualizadoEn
+    rowversion Version
+  }
+  Seguridad_TokenRefresco {
+    bigint IDTokenRefresco PK
+    int IDUsuario FK
+    binary HashToken UK
+    uniqueidentifier Familia
+    datetime2 ExpiraEn
+    datetime2 RotadoEn
+    datetime2 RevocadoEn
+    varchar DireccionIP
+    nvarchar AgenteUsuario
+    datetime2 CreadoEn
+  }
+  Clientes_Departamento {
+    smallint IDDepartamento PK
+    nvarchar Nombre UK
+  }
+  Clientes_Municipio {
+    int IDMunicipio PK
+    smallint IDDepartamento FK
+    nvarchar Nombre
+  }
+  Clientes_Direccion {
+    int IDDireccion PK
+    int IDUsuario FK
+    int IDMunicipio FK
+    nvarchar Alias
+    nvarchar Destinatario
+    varchar Telefono
+    nvarchar Linea1
+    nvarchar Linea2
+    nvarchar Referencia
+    bit EsPredeterminada
+    bit Activo
+    datetime2 CreadoEn
+  }
+  Clientes_DatoFiscal {
+    int IDDatoFiscal PK
+    int IDUsuario FK
+    varchar NIT
+    nvarchar NombreFiscal
+    bit Activo
+  }
+  Auditoria_Bitacora {
+    bigint IDBitacora PK
+    datetime2 Fecha
+    int IDUsuario FK
+    varchar Modulo
+    varchar Entidad
+    varchar IDEntidad
+    varchar Accion
+    nvarchar ValorAnterior
+    nvarchar ValorNuevo
+    varchar DireccionIP
+  }
+  Auditoria_ProteccionBitacora {
+    bigint IDBitacora PK, FK
+  }
+  Auditoria_ErrorBD {
+    bigint IDErrorBD PK
+    datetime2 Fecha
+    int IDUsuario
+    int Numero
+    int Severidad
+    int Estado
+    nvarchar Procedimiento
+    int Linea
+    nvarchar Mensaje
+  }
+  Auditoria_CambioEsquema {
+    bigint IDCambioEsquema PK
+    datetime2 Fecha
+    nvarchar Login
+    nvarchar Evento
+    nvarchar Objeto
+    nvarchar Sentencia
+  }
+  Catalogo_Impuesto {
+    smallint IDImpuesto PK
+    varchar Codigo UK
+    nvarchar Nombre
+  }
+  Catalogo_TasaImpuesto {
+    int IDTasaImpuesto PK
+    smallint IDImpuesto FK
+    decimal Porcentaje
+    datetime2 VigenteDesde
+    datetime2 VigenteHasta
+  }
+  Catalogo_Categoria {
+    int IDCategoria PK
+    int IDCategoriaPadre FK
+    nvarchar Nombre
+    varchar Slug UK
+    nvarchar Descripcion
+    smallint Orden
+    bit Activo
+    datetime2 CreadoEn
+  }
+  Catalogo_Marca {
+    int IDMarca PK
+    nvarchar Nombre UK
+    varchar Slug UK
+    nvarchar LogoUrl
+    bit Activo
+  }
+  Catalogo_Producto {
+    int IDProducto PK
+    int IDCategoria FK
+    int IDMarca FK
+    smallint IDImpuesto FK
+    nvarchar Nombre
+    varchar Slug UK
+    nvarchar Descripcion
+    smallint MesesGarantia
+    bit Activo
+    datetime2 CreadoEn
+    datetime2 ActualizadoEn
+    rowversion Version
+  }
+  Catalogo_Variante {
+    int IDVariante PK
+    int IDProducto FK
+    varchar SKU UK
+    int PesoGramos
+    bit Activo
+    datetime2 CreadoEn
+    rowversion Version
+  }
+  Catalogo_Atributo {
+    int IDAtributo PK
+    nvarchar Nombre UK
+  }
+  Catalogo_ValorAtributo {
+    int IDValorAtributo PK
+    int IDAtributo FK
+    nvarchar Valor
+  }
+  Catalogo_VarianteValorAtributo {
+    int IDVariante PK, FK
+    int IDValorAtributo PK, FK
+  }
+  Catalogo_EspecificacionProducto {
+    int IDProducto PK, FK
+    int IDValorAtributo PK, FK
+  }
+  Catalogo_ImagenProducto {
+    int IDImagenProducto PK
+    int IDProducto FK
+    int IDVariante FK
+    nvarchar Url
+    nvarchar TextoAlt
+    smallint Orden
+  }
+  Catalogo_PrecioVariante {
+    bigint IDPrecioVariante PK
+    int IDVariante FK
+    decimal Precio
+    datetime2 VigenteDesde
+    datetime2 VigenteHasta
+    int IDUsuario FK
+  }
+  Inventario_Sucursal {
+    int IDSucursal PK
+    varchar Codigo UK
+    nvarchar Nombre
+    int IDMunicipio FK
+    nvarchar Direccion
+    varchar Telefono
+    nvarchar Horario
+    bit PermiteRecoger
+    bit Activo
+  }
+  Inventario_Bodega {
+    int IDBodega PK
+    int IDSucursal FK
+    varchar Codigo UK
+    nvarchar Nombre
+    bit PermiteVentaEnLinea
+    smallint Prioridad
+    bit Activo
+  }
+  Inventario_Existencia {
+    int IDVariante PK, FK
+    int IDBodega PK, FK
+    int Fisica
+    int Reservada
+    computed Disponible
+    decimal CostoPromedio
+    int StockMinimo
+    datetime2 ActualizadoEn
+  }
+  Inventario_TipoMovimiento {
+    tinyint IDTipoMovimiento PK
+    varchar Codigo UK
+    nvarchar Nombre
+    smallint Signo
+    bit ExigeMotivo
+  }
+  Inventario_Kardex {
+    bigint IDKardex PK
+    int IDVariante FK
+    int IDBodega FK
+    tinyint IDTipoMovimiento FK
+    int Cantidad
+    int SaldoAnterior
+    int SaldoNuevo
+    decimal CostoUnitario
+    nvarchar Motivo
+    int IDUsuario FK
+    datetime2 Fecha
+    nvarchar ReferenciaDocumento
+    uniqueidentifier IDGrupoMovimiento
+    bigint IDPedidoDetalle FK
+  }
+  Marketing_Cupon {
+    int IDCupon PK
+    varchar Codigo UK
+    nvarchar Descripcion
+    varchar TipoDescuento
+    decimal Valor
+    decimal DescuentoMaximo
+    decimal MontoMinimo
+    datetime2 VigenteDesde
+    datetime2 VigenteHasta
+    int LimiteTotal
+    int LimitePorCliente
+    int IDCategoria FK
+    int UsosActuales
+    bit Activo
+    datetime2 CreadoEn
+    rowversion Version
+  }
+  Marketing_Promocion {
+    int IDPromocion PK
+    nvarchar Nombre
+    varchar Slug UK
+    varchar TipoDescuento
+    decimal Valor
+    datetime2 VigenteDesde
+    datetime2 VigenteHasta
+    bit Activo
+    datetime2 CreadoEn
+  }
+  Marketing_PromocionAlcance {
+    int IDPromocionAlcance PK
+    int IDPromocion FK
+    int IDCategoria FK
+    int IDMarca FK
+    int IDProducto FK
+    int IDVariante FK
+  }
+  Marketing_ZonaAnuncio {
+    smallint IDZonaAnuncio PK
+    varchar Codigo UK
+    nvarchar Nombre
+    tinyint MaximoVisible
+  }
+  Marketing_Anuncio {
+    int IDAnuncio PK
+    smallint IDZonaAnuncio FK
+    int IDPromocion FK
+    nvarchar Titulo
+    nvarchar Subtitulo
+    nvarchar ImagenEscritorioUrl
+    nvarchar ImagenMovilUrl
+    nvarchar UrlDestino
+    smallint Orden
+    datetime2 VigenteDesde
+    datetime2 VigenteHasta
+    bit Activo
+    datetime2 CreadoEn
+  }
+  Marketing_AnuncioMetrica {
+    int IDAnuncio PK, FK
+    date Fecha PK
+    bigint Impresiones
+    bigint Clics
+  }
+  Ventas_MetodoEnvio {
+    smallint IDMetodoEnvio PK
+    varchar Codigo UK
+    nvarchar Nombre
+    bit EsRecogerEnTienda
+    bit Activo
+  }
+  Ventas_TarifaEnvio {
+    int IDTarifaEnvio PK
+    smallint IDMetodoEnvio FK
+    smallint IDDepartamento FK
+    decimal Costo
+    decimal MontoEnvioGratis
+    tinyint DiasEstimados
+    bit Activo
+  }
+  Ventas_MetodoPago {
+    smallint IDMetodoPago PK
+    varchar Codigo UK
+    nvarchar Nombre
+    bit Activo
+  }
+  Ventas_Carrito {
+    bigint IDCarrito PK
+    int IDUsuario FK
+    binary HashTokenInvitado
+    int IDCupon FK
+    varchar Estado
+    datetime2 CreadoEn
+    datetime2 UltimaActividad
+  }
+  Ventas_CarritoDetalle {
+    bigint IDCarritoDetalle PK
+    bigint IDCarrito FK
+    int IDVariante FK
+    int Cantidad
+  }
+  Ventas_Checkout {
+    bigint IDCheckout PK
+    bigint IDCarrito FK
+    int IDUsuario FK
+    smallint IDMetodoEnvio FK
+    int IDDireccion FK
+    int IDSucursalRecoger FK
+    int IDCupon FK
+    decimal Subtotal
+    decimal DescuentoCupon
+    decimal CostoEnvio
+    decimal Total
+    varchar Estado
+    datetime2 ExpiraEn
+    datetime2 CreadoEn
+  }
+  Ventas_CheckoutDetalle {
+    bigint IDCheckoutDetalle PK
+    bigint IDCheckout FK
+    int IDVariante FK
+    int IDPromocion FK
+    int Cantidad
+    decimal PrecioLista
+    decimal DescuentoPromocion
+    decimal PrecioUnitario
+    decimal DescuentoCupon
+    decimal TasaIVA
+  }
+  Inventario_Reserva {
+    bigint IDReserva PK
+    bigint IDCheckout FK
+    int IDVariante FK
+    int IDBodega FK
+    int Cantidad
+    varchar Estado
+    datetime2 ExpiraEn
+    datetime2 CreadoEn
+  }
+  Ventas_EstadoPedido {
+    tinyint IDEstadoPedido PK
+    varchar Codigo UK
+    nvarchar Nombre
+    bit EsVentaReportable
+    bit EsCancelable
+  }
+  Ventas_TransicionEstadoPedido {
+    tinyint IDEstadoOrigen PK, FK
+    tinyint IDEstadoDestino PK, FK
+  }
+  Ventas_Pedido {
+    bigint IDPedido PK
+    varchar NumeroPedido UK
+    int IDUsuario FK
+    bigint IDCheckout FK, UK
+    tinyint IDEstadoPedido FK
+    smallint IDMetodoEnvio FK
+    int IDSucursalRecoger FK
+    int IDCupon FK
+    decimal Subtotal
+    decimal DescuentoCupon
+    decimal CostoEnvio
+    decimal Total
+    decimal BaseImponible
+    decimal IVA
+    varchar NITFactura
+    nvarchar NombreFactura
+    datetime2 FechaPedido
+    computed FechaLocal
+    rowversion Version
+  }
+  Ventas_PedidoDetalle {
+    bigint IDPedidoDetalle PK
+    bigint IDPedido FK
+    int IDVariante FK
+    int IDPromocion FK
+    varchar SKU
+    nvarchar NombreProducto
+    int Cantidad
+    decimal PrecioLista
+    decimal DescuentoPromocion
+    decimal PrecioUnitario
+    decimal DescuentoCupon
+    decimal TotalLinea
+    decimal TasaIVA
+    decimal BaseLinea
+    decimal IVALinea
+    decimal CostoUnitario
+    int CantidadDevuelta
+  }
+  Ventas_PedidoAsignacion {
+    bigint IDPedidoDetalle PK, FK
+    int IDBodega PK, FK
+    int Cantidad
+  }
+  Ventas_PedidoDireccion {
+    bigint IDPedido PK, FK
+    int IDMunicipio FK
+    nvarchar Destinatario
+    varchar Telefono
+    nvarchar Linea1
+    nvarchar Linea2
+    nvarchar Referencia
+  }
+  Ventas_PedidoHistorialEstado {
+    bigint IDPedidoHistorialEstado PK
+    bigint IDPedido FK
+    tinyint IDEstadoAnterior FK
+    tinyint IDEstadoNuevo FK
+    int IDUsuario FK
+    datetime2 Fecha
+    nvarchar Motivo
+  }
+  Ventas_Pago {
+    bigint IDPago PK
+    bigint IDCheckout FK
+    smallint IDMetodoPago FK
+    decimal Monto
+    varchar Estado
+    varchar ReferenciaPasarela UK
+    nvarchar Mensaje
+    datetime2 Fecha
+  }
+  Ventas_CuponUso {
+    bigint IDCuponUso PK
+    int IDCupon FK
+    int IDUsuario FK
+    bigint IDCheckout FK, UK
+    bigint IDPedido FK
+    decimal Monto
+    varchar Estado
+    datetime2 Fecha
+  }
+  Ventas_SolicitudIdempotente {
+    bigint IDSolicitudIdempotente PK
+    varchar Operacion
+    int IDUsuario FK
+    uniqueidentifier Llave
+    binary HashSolicitud
+    bigint IDRecurso
+    datetime2 CreadoEn
+  }
+  Ventas_Devolucion {
+    bigint IDDevolucion PK
+    bigint IDPedido FK
+    int IDUsuario FK
+    nvarchar Motivo
+    datetime2 Fecha
+  }
+  Ventas_DevolucionDetalle {
+    bigint IDDevolucionDetalle PK
+    bigint IDDevolucion FK
+    bigint IDPedidoDetalle FK
+    int IDBodega FK
+    int Cantidad
+    decimal Monto
+    bit ReingresaInventario
+  }
+  Ventas_Reembolso {
+    bigint IDReembolso PK
+    bigint IDPedido FK
+    bigint IDDevolucion FK
+    decimal Monto
+    varchar Estado
+    varchar Referencia
+    datetime2 Fecha
+  }
+  Ventas_Factura {
+    bigint IDFactura PK
+    bigint IDPedido FK, UK
+    varchar NumeroAutorizacion
+    varchar Serie
+    varchar Numero
+    varchar Estado
+    datetime2 FechaCertificacion
+  }
+  Ventas_EventoSalida {
+    bigint IDEventoSalida PK
+    varchar TipoEvento
+    nvarchar Contenido
+    datetime2 CreadoEn
+    datetime2 ProcesadoEn
+  }
+  Seguridad_Rol ||--o{ Seguridad_RolPermiso : "IDRol"
+  Seguridad_Permiso ||--o{ Seguridad_RolPermiso : "IDPermiso"
+  Seguridad_Rol ||--o{ Seguridad_Usuario : "IDRol"
+  Seguridad_Usuario ||--o{ Seguridad_TokenRefresco : "IDUsuario"
+  Clientes_Departamento ||--o{ Clientes_Municipio : "IDDepartamento"
+  Seguridad_Usuario ||--o{ Clientes_Direccion : "IDUsuario"
+  Clientes_Municipio ||--o{ Clientes_Direccion : "IDMunicipio"
+  Seguridad_Usuario ||--o{ Clientes_DatoFiscal : "IDUsuario"
+  Seguridad_Usuario |o--o{ Auditoria_Bitacora : "IDUsuario"
+  Auditoria_Bitacora ||--o| Auditoria_ProteccionBitacora : "IDBitacora"
+  Catalogo_Impuesto ||--o{ Catalogo_TasaImpuesto : "IDImpuesto"
+  Catalogo_Categoria |o--o{ Catalogo_Categoria : "IDCategoriaPadre"
+  Catalogo_Categoria ||--o{ Catalogo_Producto : "IDCategoria"
+  Catalogo_Marca |o--o{ Catalogo_Producto : "IDMarca"
+  Catalogo_Impuesto ||--o{ Catalogo_Producto : "IDImpuesto"
+  Catalogo_Producto ||--o{ Catalogo_Variante : "IDProducto"
+  Catalogo_Atributo ||--o{ Catalogo_ValorAtributo : "IDAtributo"
+  Catalogo_Variante ||--o{ Catalogo_VarianteValorAtributo : "IDVariante"
+  Catalogo_ValorAtributo ||--o{ Catalogo_VarianteValorAtributo : "IDValorAtributo"
+  Catalogo_Producto ||--o{ Catalogo_EspecificacionProducto : "IDProducto"
+  Catalogo_ValorAtributo ||--o{ Catalogo_EspecificacionProducto : "IDValorAtributo"
+  Catalogo_Producto ||--o{ Catalogo_ImagenProducto : "IDProducto"
+  Catalogo_Variante |o--o{ Catalogo_ImagenProducto : "IDVariante"
+  Catalogo_Variante ||--o{ Catalogo_PrecioVariante : "IDVariante"
+  Seguridad_Usuario ||--o{ Catalogo_PrecioVariante : "IDUsuario"
+  Clientes_Municipio ||--o{ Inventario_Sucursal : "IDMunicipio"
+  Inventario_Sucursal |o--o{ Inventario_Bodega : "IDSucursal"
+  Catalogo_Variante ||--o{ Inventario_Existencia : "IDVariante"
+  Inventario_Bodega ||--o{ Inventario_Existencia : "IDBodega"
+  Inventario_TipoMovimiento ||--o{ Inventario_Kardex : "IDTipoMovimiento"
+  Seguridad_Usuario ||--o{ Inventario_Kardex : "IDUsuario"
+  Inventario_Existencia ||--o{ Inventario_Kardex : "IDVariante"
+  Catalogo_Categoria |o--o{ Marketing_Cupon : "IDCategoria"
+  Marketing_Promocion ||--o{ Marketing_PromocionAlcance : "IDPromocion"
+  Catalogo_Categoria |o--o{ Marketing_PromocionAlcance : "IDCategoria"
+  Catalogo_Marca |o--o{ Marketing_PromocionAlcance : "IDMarca"
+  Catalogo_Producto |o--o{ Marketing_PromocionAlcance : "IDProducto"
+  Catalogo_Variante |o--o{ Marketing_PromocionAlcance : "IDVariante"
+  Marketing_ZonaAnuncio ||--o{ Marketing_Anuncio : "IDZonaAnuncio"
+  Marketing_Promocion |o--o{ Marketing_Anuncio : "IDPromocion"
+  Marketing_Anuncio ||--o{ Marketing_AnuncioMetrica : "IDAnuncio"
+  Ventas_MetodoEnvio ||--o{ Ventas_TarifaEnvio : "IDMetodoEnvio"
+  Clientes_Departamento ||--o{ Ventas_TarifaEnvio : "IDDepartamento"
+  Seguridad_Usuario |o--o{ Ventas_Carrito : "IDUsuario"
+  Marketing_Cupon |o--o{ Ventas_Carrito : "IDCupon"
+  Ventas_Carrito ||--o{ Ventas_CarritoDetalle : "IDCarrito"
+  Catalogo_Variante ||--o{ Ventas_CarritoDetalle : "IDVariante"
+  Ventas_Carrito ||--o{ Ventas_Checkout : "IDCarrito"
+  Seguridad_Usuario ||--o{ Ventas_Checkout : "IDUsuario"
+  Ventas_MetodoEnvio ||--o{ Ventas_Checkout : "IDMetodoEnvio"
+  Clientes_Direccion |o--o{ Ventas_Checkout : "IDDireccion"
+  Inventario_Sucursal |o--o{ Ventas_Checkout : "IDSucursalRecoger"
+  Marketing_Cupon |o--o{ Ventas_Checkout : "IDCupon"
+  Ventas_Checkout ||--o{ Ventas_CheckoutDetalle : "IDCheckout"
+  Catalogo_Variante ||--o{ Ventas_CheckoutDetalle : "IDVariante"
+  Marketing_Promocion |o--o{ Ventas_CheckoutDetalle : "IDPromocion"
+  Ventas_Checkout ||--o{ Inventario_Reserva : "IDCheckout"
+  Inventario_Existencia ||--o{ Inventario_Reserva : "IDVariante"
+  Ventas_EstadoPedido ||--o{ Ventas_TransicionEstadoPedido : "IDEstadoOrigen"
+  Ventas_EstadoPedido ||--o{ Ventas_TransicionEstadoPedido : "IDEstadoDestino"
+  Seguridad_Usuario ||--o{ Ventas_Pedido : "IDUsuario"
+  Ventas_Checkout ||--o| Ventas_Pedido : "IDCheckout"
+  Ventas_EstadoPedido ||--o{ Ventas_Pedido : "IDEstadoPedido"
+  Ventas_MetodoEnvio ||--o{ Ventas_Pedido : "IDMetodoEnvio"
+  Inventario_Sucursal |o--o{ Ventas_Pedido : "IDSucursalRecoger"
+  Marketing_Cupon |o--o{ Ventas_Pedido : "IDCupon"
+  Ventas_Pedido ||--o{ Ventas_PedidoDetalle : "IDPedido"
+  Catalogo_Variante ||--o{ Ventas_PedidoDetalle : "IDVariante"
+  Marketing_Promocion |o--o{ Ventas_PedidoDetalle : "IDPromocion"
+  Ventas_PedidoDetalle ||--o{ Ventas_PedidoAsignacion : "IDPedidoDetalle"
+  Inventario_Bodega ||--o{ Ventas_PedidoAsignacion : "IDBodega"
+  Ventas_Pedido ||--o| Ventas_PedidoDireccion : "IDPedido"
+  Clientes_Municipio ||--o{ Ventas_PedidoDireccion : "IDMunicipio"
+  Ventas_Pedido ||--o{ Ventas_PedidoHistorialEstado : "IDPedido"
+  Ventas_EstadoPedido |o--o{ Ventas_PedidoHistorialEstado : "IDEstadoAnterior"
+  Ventas_EstadoPedido ||--o{ Ventas_PedidoHistorialEstado : "IDEstadoNuevo"
+  Seguridad_Usuario ||--o{ Ventas_PedidoHistorialEstado : "IDUsuario"
+  Ventas_Checkout ||--o{ Ventas_Pago : "IDCheckout"
+  Ventas_MetodoPago ||--o{ Ventas_Pago : "IDMetodoPago"
+  Marketing_Cupon ||--o{ Ventas_CuponUso : "IDCupon"
+  Seguridad_Usuario ||--o{ Ventas_CuponUso : "IDUsuario"
+  Ventas_Checkout ||--o| Ventas_CuponUso : "IDCheckout"
+  Ventas_Pedido |o--o{ Ventas_CuponUso : "IDPedido"
+  Seguridad_Usuario ||--o{ Ventas_SolicitudIdempotente : "IDUsuario"
+  Ventas_Pedido ||--o{ Ventas_Devolucion : "IDPedido"
+  Seguridad_Usuario ||--o{ Ventas_Devolucion : "IDUsuario"
+  Ventas_Devolucion ||--o{ Ventas_DevolucionDetalle : "IDDevolucion"
+  Ventas_PedidoDetalle ||--o{ Ventas_DevolucionDetalle : "IDPedidoDetalle"
+  Inventario_Bodega ||--o{ Ventas_DevolucionDetalle : "IDBodega"
+  Ventas_Pedido ||--o{ Ventas_Reembolso : "IDPedido"
+  Ventas_Devolucion |o--o{ Ventas_Reembolso : "IDDevolucion"
+  Ventas_Pedido ||--o| Ventas_Factura : "IDPedido"
+  Ventas_PedidoDetalle |o--o{ Inventario_Kardex : "IDPedidoDetalle"

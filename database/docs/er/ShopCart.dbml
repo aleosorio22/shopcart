@@ -1,0 +1,838 @@
+// Generado por generar_er.py. No editar a mano.
+
+Table "Config"."Parametro" {
+  "Clave" "varchar(60)" [pk]
+  "Valor" "nvarchar(200)" [not null]
+  "TipoDato" "varchar(10)" [not null]
+  "Descripcion" "nvarchar(300)" [not null]
+  "ActualizadoEn" "datetime2(3)" [not null]
+}
+
+Table "Config"."ErrorNegocio" {
+  "Codigo" "int" [pk]
+  "CodigoNegocio" "varchar(50)" [unique, not null]
+  "Mensaje" "nvarchar(300)" [not null]
+  "HttpStatus" "smallint" [not null]
+}
+
+Table "Seguridad"."Rol" {
+  "IDRol" "smallint" [pk, increment]
+  "Codigo" "varchar(30)" [unique, not null]
+  "Nombre" "nvarchar(60)" [not null]
+}
+
+Table "Seguridad"."Permiso" {
+  "IDPermiso" "smallint" [pk, increment]
+  "Codigo" "varchar(60)" [unique, not null]
+  "Descripcion" "nvarchar(200)" [not null]
+}
+
+Table "Seguridad"."RolPermiso" {
+  "IDRol" "smallint" [not null]
+  "IDPermiso" "smallint" [not null]
+  indexes {
+    ("IDRol", "IDPermiso") [pk]
+  }
+}
+
+Table "Seguridad"."Usuario" {
+  "IDUsuario" "int" [pk, increment]
+  "Correo" "nvarchar(254)" [unique, not null]
+  "HashContrasena" "varchar(255)" [not null]
+  "Nombres" "nvarchar(100)" [not null]
+  "Apellidos" "nvarchar(100)" [not null]
+  "Telefono" "varchar(20)"
+  "IDRol" "smallint" [not null]
+  "Activo" "bit" [not null]
+  "IntentosFallidos" "tinyint" [not null]
+  "BloqueadoHasta" "datetime2(3)"
+  "UltimoAcceso" "datetime2(3)"
+  "CreadoEn" "datetime2(3)" [not null]
+  "ActualizadoEn" "datetime2(3)" [not null]
+  "Version" "rowversion" [not null]
+}
+
+Table "Seguridad"."TokenRefresco" {
+  "IDTokenRefresco" "bigint" [pk, increment]
+  "IDUsuario" "int" [not null]
+  "HashToken" "binary(32)" [unique, not null]
+  "Familia" "uniqueidentifier" [not null]
+  "ExpiraEn" "datetime2(3)" [not null]
+  "RotadoEn" "datetime2(3)"
+  "RevocadoEn" "datetime2(3)"
+  "DireccionIP" "varchar(45)"
+  "AgenteUsuario" "nvarchar(300)"
+  "CreadoEn" "datetime2(3)" [not null]
+}
+
+Table "Clientes"."Departamento" {
+  "IDDepartamento" "smallint" [pk, increment]
+  "Nombre" "nvarchar(60)" [unique, not null]
+}
+
+Table "Clientes"."Municipio" {
+  "IDMunicipio" "int" [pk, increment]
+  "IDDepartamento" "smallint" [not null]
+  "Nombre" "nvarchar(80)" [not null]
+  indexes {
+    ("IDDepartamento", "Nombre") [unique]
+  }
+}
+
+Table "Clientes"."Direccion" {
+  "IDDireccion" "int" [pk, increment]
+  "IDUsuario" "int" [not null]
+  "IDMunicipio" "int" [not null]
+  "Alias" "nvarchar(40)" [not null]
+  "Destinatario" "nvarchar(150)" [not null]
+  "Telefono" "varchar(20)" [not null]
+  "Linea1" "nvarchar(200)" [not null]
+  "Linea2" "nvarchar(200)"
+  "Referencia" "nvarchar(300)"
+  "EsPredeterminada" "bit" [not null]
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+}
+
+Table "Clientes"."DatoFiscal" {
+  "IDDatoFiscal" "int" [pk, increment]
+  "IDUsuario" "int" [not null]
+  "NIT" "varchar(15)" [not null]
+  "NombreFiscal" "nvarchar(200)" [not null]
+  "Activo" "bit" [not null]
+  indexes {
+    ("IDUsuario", "NIT") [unique]
+  }
+}
+
+Table "Auditoria"."Bitacora" {
+  "IDBitacora" "bigint" [pk, increment]
+  "Fecha" "datetime2(3)" [not null]
+  "IDUsuario" "int"
+  "Modulo" "varchar(30)" [not null]
+  "Entidad" "varchar(60)" [not null]
+  "IDEntidad" "varchar(60)" [not null]
+  "Accion" "varchar(20)" [not null]
+  "ValorAnterior" "nvarchar(max)"
+  "ValorNuevo" "nvarchar(max)"
+  "DireccionIP" "varchar(45)"
+}
+
+Table "Auditoria"."ProteccionBitacora" {
+  "IDBitacora" "bigint" [pk]
+}
+
+Table "Auditoria"."ErrorBD" {
+  "IDErrorBD" "bigint" [pk, increment]
+  "Fecha" "datetime2(3)" [not null]
+  "IDUsuario" "int"
+  "Numero" "int" [not null]
+  "Severidad" "int" [not null]
+  "Estado" "int" [not null]
+  "Procedimiento" "nvarchar(200)"
+  "Linea" "int"
+  "Mensaje" "nvarchar(4000)" [not null]
+}
+
+Table "Auditoria"."CambioEsquema" {
+  "IDCambioEsquema" "bigint" [pk, increment]
+  "Fecha" "datetime2(3)" [not null]
+  "Login" "nvarchar(128)" [not null]
+  "Evento" "nvarchar(100)" [not null]
+  "Objeto" "nvarchar(256)"
+  "Sentencia" "nvarchar(max)"
+}
+
+Table "Catalogo"."Impuesto" {
+  "IDImpuesto" "smallint" [pk, increment]
+  "Codigo" "varchar(20)" [unique, not null]
+  "Nombre" "nvarchar(60)" [not null]
+}
+
+Table "Catalogo"."TasaImpuesto" {
+  "IDTasaImpuesto" "int" [pk, increment]
+  "IDImpuesto" "smallint" [not null]
+  "Porcentaje" "decimal(5,2)" [not null]
+  "VigenteDesde" "datetime2(3)" [not null]
+  "VigenteHasta" "datetime2(3)"
+  indexes {
+    ("IDImpuesto", "VigenteDesde") [unique]
+  }
+}
+
+Table "Catalogo"."Categoria" {
+  "IDCategoria" "int" [pk, increment]
+  "IDCategoriaPadre" "int"
+  "Nombre" "nvarchar(100)" [not null]
+  "Slug" "varchar(120)" [unique, not null]
+  "Descripcion" "nvarchar(500)"
+  "Orden" "smallint" [not null]
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+}
+
+Table "Catalogo"."Marca" {
+  "IDMarca" "int" [pk, increment]
+  "Nombre" "nvarchar(100)" [unique, not null]
+  "Slug" "varchar(120)" [unique, not null]
+  "LogoUrl" "nvarchar(500)"
+  "Activo" "bit" [not null]
+}
+
+Table "Catalogo"."Producto" {
+  "IDProducto" "int" [pk, increment]
+  "IDCategoria" "int" [not null]
+  "IDMarca" "int"
+  "IDImpuesto" "smallint" [not null]
+  "Nombre" "nvarchar(200)" [not null]
+  "Slug" "varchar(220)" [unique, not null]
+  "Descripcion" "nvarchar(max)"
+  "MesesGarantia" "smallint" [not null]
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  "ActualizadoEn" "datetime2(3)" [not null]
+  "Version" "rowversion" [not null]
+}
+
+Table "Catalogo"."Variante" {
+  "IDVariante" "int" [pk, increment]
+  "IDProducto" "int" [not null]
+  "SKU" "varchar(40)" [unique, not null]
+  "PesoGramos" "int"
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  "Version" "rowversion" [not null]
+}
+
+Table "Catalogo"."Atributo" {
+  "IDAtributo" "int" [pk, increment]
+  "Nombre" "nvarchar(60)" [unique, not null]
+}
+
+Table "Catalogo"."ValorAtributo" {
+  "IDValorAtributo" "int" [pk, increment]
+  "IDAtributo" "int" [not null]
+  "Valor" "nvarchar(100)" [not null]
+  indexes {
+    ("IDAtributo", "Valor") [unique]
+  }
+}
+
+Table "Catalogo"."VarianteValorAtributo" {
+  "IDVariante" "int" [not null]
+  "IDValorAtributo" "int" [not null]
+  indexes {
+    ("IDVariante", "IDValorAtributo") [pk]
+  }
+}
+
+Table "Catalogo"."EspecificacionProducto" {
+  "IDProducto" "int" [not null]
+  "IDValorAtributo" "int" [not null]
+  indexes {
+    ("IDProducto", "IDValorAtributo") [pk]
+  }
+}
+
+Table "Catalogo"."ImagenProducto" {
+  "IDImagenProducto" "int" [pk, increment]
+  "IDProducto" "int" [not null]
+  "IDVariante" "int"
+  "Url" "nvarchar(500)" [not null]
+  "TextoAlt" "nvarchar(200)"
+  "Orden" "smallint" [not null]
+}
+
+Table "Catalogo"."PrecioVariante" {
+  "IDPrecioVariante" "bigint" [pk, increment]
+  "IDVariante" "int" [not null]
+  "Precio" "decimal(18,2)" [not null]
+  "VigenteDesde" "datetime2(3)" [not null]
+  "VigenteHasta" "datetime2(3)"
+  "IDUsuario" "int" [not null]
+  indexes {
+    ("IDVariante", "VigenteDesde") [unique]
+  }
+}
+
+Table "Inventario"."Sucursal" {
+  "IDSucursal" "int" [pk, increment]
+  "Codigo" "varchar(20)" [unique, not null]
+  "Nombre" "nvarchar(120)" [not null]
+  "IDMunicipio" "int" [not null]
+  "Direccion" "nvarchar(250)" [not null]
+  "Telefono" "varchar(20)"
+  "Horario" "nvarchar(200)"
+  "PermiteRecoger" "bit" [not null]
+  "Activo" "bit" [not null]
+}
+
+Table "Inventario"."Bodega" {
+  "IDBodega" "int" [pk, increment]
+  "IDSucursal" "int"
+  "Codigo" "varchar(20)" [unique, not null]
+  "Nombre" "nvarchar(120)" [not null]
+  "PermiteVentaEnLinea" "bit" [not null]
+  "Prioridad" "smallint" [not null]
+  "Activo" "bit" [not null]
+}
+
+Table "Inventario"."Existencia" {
+  "IDVariante" "int" [not null]
+  "IDBodega" "int" [not null]
+  "Fisica" "int" [not null]
+  "Reservada" "int" [not null]
+  "Disponible" "computed" [not null]
+  "CostoPromedio" "decimal(18,4)" [not null]
+  "StockMinimo" "int" [not null]
+  "ActualizadoEn" "datetime2(3)" [not null]
+  indexes {
+    ("IDVariante", "IDBodega") [pk]
+  }
+}
+
+Table "Inventario"."TipoMovimiento" {
+  "IDTipoMovimiento" "tinyint" [pk, increment]
+  "Codigo" "varchar(30)" [unique, not null]
+  "Nombre" "nvarchar(60)" [not null]
+  "Signo" "smallint" [not null]
+  "ExigeMotivo" "bit" [not null]
+}
+
+Table "Inventario"."Kardex" {
+  "IDKardex" "bigint" [pk, increment]
+  "IDVariante" "int" [not null]
+  "IDBodega" "int" [not null]
+  "IDTipoMovimiento" "tinyint" [not null]
+  "Cantidad" "int" [not null]
+  "SaldoAnterior" "int" [not null]
+  "SaldoNuevo" "int" [not null]
+  "CostoUnitario" "decimal(18,4)" [not null]
+  "Motivo" "nvarchar(300)" [not null]
+  "IDUsuario" "int" [not null]
+  "Fecha" "datetime2(3)" [not null]
+  "ReferenciaDocumento" "nvarchar(60)"
+  "IDGrupoMovimiento" "uniqueidentifier"
+  "IDPedidoDetalle" "bigint"
+}
+
+Table "Marketing"."Cupon" {
+  "IDCupon" "int" [pk, increment]
+  "Codigo" "varchar(40)" [unique, not null]
+  "Descripcion" "nvarchar(200)"
+  "TipoDescuento" "varchar(10)" [not null]
+  "Valor" "decimal(18,2)" [not null]
+  "DescuentoMaximo" "decimal(18,2)"
+  "MontoMinimo" "decimal(18,2)" [not null]
+  "VigenteDesde" "datetime2(3)" [not null]
+  "VigenteHasta" "datetime2(3)" [not null]
+  "LimiteTotal" "int"
+  "LimitePorCliente" "int" [not null]
+  "IDCategoria" "int"
+  "UsosActuales" "int" [not null]
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  "Version" "rowversion" [not null]
+}
+
+Table "Marketing"."Promocion" {
+  "IDPromocion" "int" [pk, increment]
+  "Nombre" "nvarchar(120)" [not null]
+  "Slug" "varchar(140)" [unique, not null]
+  "TipoDescuento" "varchar(10)" [not null]
+  "Valor" "decimal(18,2)" [not null]
+  "VigenteDesde" "datetime2(3)" [not null]
+  "VigenteHasta" "datetime2(3)" [not null]
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+}
+
+Table "Marketing"."PromocionAlcance" {
+  "IDPromocionAlcance" "int" [pk, increment]
+  "IDPromocion" "int" [not null]
+  "IDCategoria" "int"
+  "IDMarca" "int"
+  "IDProducto" "int"
+  "IDVariante" "int"
+}
+
+Table "Marketing"."ZonaAnuncio" {
+  "IDZonaAnuncio" "smallint" [pk, increment]
+  "Codigo" "varchar(40)" [unique, not null]
+  "Nombre" "nvarchar(80)" [not null]
+  "MaximoVisible" "tinyint" [not null]
+}
+
+Table "Marketing"."Anuncio" {
+  "IDAnuncio" "int" [pk, increment]
+  "IDZonaAnuncio" "smallint" [not null]
+  "IDPromocion" "int"
+  "Titulo" "nvarchar(120)" [not null]
+  "Subtitulo" "nvarchar(200)"
+  "ImagenEscritorioUrl" "nvarchar(500)" [not null]
+  "ImagenMovilUrl" "nvarchar(500)"
+  "UrlDestino" "nvarchar(500)" [not null]
+  "Orden" "smallint" [not null]
+  "VigenteDesde" "datetime2(3)" [not null]
+  "VigenteHasta" "datetime2(3)" [not null]
+  "Activo" "bit" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+}
+
+Table "Marketing"."AnuncioMetrica" {
+  "IDAnuncio" "int" [not null]
+  "Fecha" "date" [not null]
+  "Impresiones" "bigint" [not null]
+  "Clics" "bigint" [not null]
+  indexes {
+    ("IDAnuncio", "Fecha") [pk]
+  }
+}
+
+Table "Ventas"."MetodoEnvio" {
+  "IDMetodoEnvio" "smallint" [pk, increment]
+  "Codigo" "varchar(30)" [unique, not null]
+  "Nombre" "nvarchar(80)" [not null]
+  "EsRecogerEnTienda" "bit" [not null]
+  "Activo" "bit" [not null]
+}
+
+Table "Ventas"."TarifaEnvio" {
+  "IDTarifaEnvio" "int" [pk, increment]
+  "IDMetodoEnvio" "smallint" [not null]
+  "IDDepartamento" "smallint" [not null]
+  "Costo" "decimal(18,2)" [not null]
+  "MontoEnvioGratis" "decimal(18,2)"
+  "DiasEstimados" "tinyint" [not null]
+  "Activo" "bit" [not null]
+  indexes {
+    ("IDMetodoEnvio", "IDDepartamento") [unique]
+  }
+}
+
+Table "Ventas"."MetodoPago" {
+  "IDMetodoPago" "smallint" [pk, increment]
+  "Codigo" "varchar(30)" [unique, not null]
+  "Nombre" "nvarchar(80)" [not null]
+  "Activo" "bit" [not null]
+}
+
+Table "Ventas"."Carrito" {
+  "IDCarrito" "bigint" [pk, increment]
+  "IDUsuario" "int"
+  "HashTokenInvitado" "binary(32)"
+  "IDCupon" "int"
+  "Estado" "varchar(12)" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  "UltimaActividad" "datetime2(3)" [not null]
+}
+
+Table "Ventas"."CarritoDetalle" {
+  "IDCarritoDetalle" "bigint" [pk, increment]
+  "IDCarrito" "bigint" [not null]
+  "IDVariante" "int" [not null]
+  "Cantidad" "int" [not null]
+  indexes {
+    ("IDCarrito", "IDVariante") [unique]
+  }
+}
+
+Table "Ventas"."Checkout" {
+  "IDCheckout" "bigint" [pk, increment]
+  "IDCarrito" "bigint" [not null]
+  "IDUsuario" "int" [not null]
+  "IDMetodoEnvio" "smallint" [not null]
+  "IDDireccion" "int"
+  "IDSucursalRecoger" "int"
+  "IDCupon" "int"
+  "Subtotal" "decimal(18,2)" [not null]
+  "DescuentoCupon" "decimal(18,2)" [not null]
+  "CostoEnvio" "decimal(18,2)" [not null]
+  "Total" "decimal(18,2)" [not null]
+  "Estado" "varchar(12)" [not null]
+  "ExpiraEn" "datetime2(3)" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+}
+
+Table "Ventas"."CheckoutDetalle" {
+  "IDCheckoutDetalle" "bigint" [pk, increment]
+  "IDCheckout" "bigint" [not null]
+  "IDVariante" "int" [not null]
+  "IDPromocion" "int"
+  "Cantidad" "int" [not null]
+  "PrecioLista" "decimal(18,2)" [not null]
+  "DescuentoPromocion" "decimal(18,2)" [not null]
+  "PrecioUnitario" "decimal(18,2)" [not null]
+  "DescuentoCupon" "decimal(18,2)" [not null]
+  "TasaIVA" "decimal(5,2)" [not null]
+  indexes {
+    ("IDCheckout", "IDVariante") [unique]
+  }
+}
+
+Table "Inventario"."Reserva" {
+  "IDReserva" "bigint" [pk, increment]
+  "IDCheckout" "bigint" [not null]
+  "IDVariante" "int" [not null]
+  "IDBodega" "int" [not null]
+  "Cantidad" "int" [not null]
+  "Estado" "varchar(10)" [not null]
+  "ExpiraEn" "datetime2(3)" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  indexes {
+    ("IDCheckout", "IDVariante", "IDBodega") [unique]
+  }
+}
+
+Table "Ventas"."EstadoPedido" {
+  "IDEstadoPedido" "tinyint" [pk]
+  "Codigo" "varchar(30)" [unique, not null]
+  "Nombre" "nvarchar(60)" [not null]
+  "EsVentaReportable" "bit" [not null]
+  "EsCancelable" "bit" [not null]
+}
+
+Table "Ventas"."TransicionEstadoPedido" {
+  "IDEstadoOrigen" "tinyint" [not null]
+  "IDEstadoDestino" "tinyint" [not null]
+  indexes {
+    ("IDEstadoOrigen", "IDEstadoDestino") [pk]
+  }
+}
+
+Table "Ventas"."Pedido" {
+  "IDPedido" "bigint" [pk, increment]
+  "NumeroPedido" "varchar(20)" [unique, not null]
+  "IDUsuario" "int" [not null]
+  "IDCheckout" "bigint" [unique, not null]
+  "IDEstadoPedido" "tinyint" [not null]
+  "IDMetodoEnvio" "smallint" [not null]
+  "IDSucursalRecoger" "int"
+  "IDCupon" "int"
+  "Subtotal" "decimal(18,2)" [not null]
+  "DescuentoCupon" "decimal(18,2)" [not null]
+  "CostoEnvio" "decimal(18,2)" [not null]
+  "Total" "decimal(18,2)" [not null]
+  "BaseImponible" "decimal(18,2)" [not null]
+  "IVA" "decimal(18,2)" [not null]
+  "NITFactura" "varchar(15)" [not null]
+  "NombreFactura" "nvarchar(200)" [not null]
+  "FechaPedido" "datetime2(3)" [not null]
+  "FechaLocal" "computed" [not null]
+  "Version" "rowversion" [not null]
+}
+
+Table "Ventas"."PedidoDetalle" {
+  "IDPedidoDetalle" "bigint" [pk, increment]
+  "IDPedido" "bigint" [not null]
+  "IDVariante" "int" [not null]
+  "IDPromocion" "int"
+  "SKU" "varchar(40)" [not null]
+  "NombreProducto" "nvarchar(200)" [not null]
+  "Cantidad" "int" [not null]
+  "PrecioLista" "decimal(18,2)" [not null]
+  "DescuentoPromocion" "decimal(18,2)" [not null]
+  "PrecioUnitario" "decimal(18,2)" [not null]
+  "DescuentoCupon" "decimal(18,2)" [not null]
+  "TotalLinea" "decimal(18,2)" [not null]
+  "TasaIVA" "decimal(5,2)" [not null]
+  "BaseLinea" "decimal(18,2)" [not null]
+  "IVALinea" "decimal(18,2)" [not null]
+  "CostoUnitario" "decimal(18,4)" [not null]
+  "CantidadDevuelta" "int" [not null]
+  indexes {
+    ("IDPedido", "IDVariante") [unique]
+  }
+}
+
+Table "Ventas"."PedidoAsignacion" {
+  "IDPedidoDetalle" "bigint" [not null]
+  "IDBodega" "int" [not null]
+  "Cantidad" "int" [not null]
+  indexes {
+    ("IDPedidoDetalle", "IDBodega") [pk]
+  }
+}
+
+Table "Ventas"."PedidoDireccion" {
+  "IDPedido" "bigint" [pk]
+  "IDMunicipio" "int" [not null]
+  "Destinatario" "nvarchar(150)" [not null]
+  "Telefono" "varchar(20)" [not null]
+  "Linea1" "nvarchar(200)" [not null]
+  "Linea2" "nvarchar(200)"
+  "Referencia" "nvarchar(300)"
+}
+
+Table "Ventas"."PedidoHistorialEstado" {
+  "IDPedidoHistorialEstado" "bigint" [pk, increment]
+  "IDPedido" "bigint" [not null]
+  "IDEstadoAnterior" "tinyint"
+  "IDEstadoNuevo" "tinyint" [not null]
+  "IDUsuario" "int" [not null]
+  "Fecha" "datetime2(3)" [not null]
+  "Motivo" "nvarchar(300)"
+}
+
+Table "Ventas"."Pago" {
+  "IDPago" "bigint" [pk, increment]
+  "IDCheckout" "bigint" [not null]
+  "IDMetodoPago" "smallint" [not null]
+  "Monto" "decimal(18,2)" [not null]
+  "Estado" "varchar(20)" [not null]
+  "ReferenciaPasarela" "varchar(100)" [unique, not null]
+  "Mensaje" "nvarchar(300)"
+  "Fecha" "datetime2(3)" [not null]
+}
+
+Table "Ventas"."CuponUso" {
+  "IDCuponUso" "bigint" [pk, increment]
+  "IDCupon" "int" [not null]
+  "IDUsuario" "int" [not null]
+  "IDCheckout" "bigint" [unique, not null]
+  "IDPedido" "bigint"
+  "Monto" "decimal(18,2)" [not null]
+  "Estado" "varchar(10)" [not null]
+  "Fecha" "datetime2(3)" [not null]
+}
+
+Table "Ventas"."SolicitudIdempotente" {
+  "IDSolicitudIdempotente" "bigint" [pk, increment]
+  "Operacion" "varchar(40)" [not null]
+  "IDUsuario" "int" [not null]
+  "Llave" "uniqueidentifier" [not null]
+  "HashSolicitud" "binary(32)" [not null]
+  "IDRecurso" "bigint" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  indexes {
+    ("Operacion", "IDUsuario", "Llave") [unique]
+  }
+}
+
+Table "Ventas"."Devolucion" {
+  "IDDevolucion" "bigint" [pk, increment]
+  "IDPedido" "bigint" [not null]
+  "IDUsuario" "int" [not null]
+  "Motivo" "nvarchar(300)" [not null]
+  "Fecha" "datetime2(3)" [not null]
+}
+
+Table "Ventas"."DevolucionDetalle" {
+  "IDDevolucionDetalle" "bigint" [pk, increment]
+  "IDDevolucion" "bigint" [not null]
+  "IDPedidoDetalle" "bigint" [not null]
+  "IDBodega" "int" [not null]
+  "Cantidad" "int" [not null]
+  "Monto" "decimal(18,2)" [not null]
+  "ReingresaInventario" "bit" [not null]
+  indexes {
+    ("IDDevolucion", "IDPedidoDetalle") [unique]
+  }
+}
+
+Table "Ventas"."Reembolso" {
+  "IDReembolso" "bigint" [pk, increment]
+  "IDPedido" "bigint" [not null]
+  "IDDevolucion" "bigint"
+  "Monto" "decimal(18,2)" [not null]
+  "Estado" "varchar(10)" [not null]
+  "Referencia" "varchar(100)"
+  "Fecha" "datetime2(3)" [not null]
+}
+
+Table "Ventas"."Factura" {
+  "IDFactura" "bigint" [pk, increment]
+  "IDPedido" "bigint" [unique, not null]
+  "NumeroAutorizacion" "varchar(40)"
+  "Serie" "varchar(20)"
+  "Numero" "varchar(20)"
+  "Estado" "varchar(12)" [not null]
+  "FechaCertificacion" "datetime2(3)"
+}
+
+Table "Ventas"."EventoSalida" {
+  "IDEventoSalida" "bigint" [pk, increment]
+  "TipoEvento" "varchar(50)" [not null]
+  "Contenido" "nvarchar(max)" [not null]
+  "CreadoEn" "datetime2(3)" [not null]
+  "ProcesadoEn" "datetime2(3)"
+}
+
+Ref: "Seguridad"."RolPermiso"."IDRol" > "Seguridad"."Rol"."IDRol"
+Ref: "Seguridad"."RolPermiso"."IDPermiso" > "Seguridad"."Permiso"."IDPermiso"
+Ref: "Seguridad"."Usuario"."IDRol" > "Seguridad"."Rol"."IDRol"
+Ref: "Seguridad"."TokenRefresco"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Clientes"."Municipio"."IDDepartamento" > "Clientes"."Departamento"."IDDepartamento"
+Ref: "Clientes"."Direccion"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Clientes"."Direccion"."IDMunicipio" > "Clientes"."Municipio"."IDMunicipio"
+Ref: "Clientes"."DatoFiscal"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Auditoria"."Bitacora"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Auditoria"."ProteccionBitacora"."IDBitacora" - "Auditoria"."Bitacora"."IDBitacora"
+Ref: "Catalogo"."TasaImpuesto"."IDImpuesto" > "Catalogo"."Impuesto"."IDImpuesto"
+Ref: "Catalogo"."Categoria"."IDCategoriaPadre" > "Catalogo"."Categoria"."IDCategoria"
+Ref: "Catalogo"."Producto"."IDCategoria" > "Catalogo"."Categoria"."IDCategoria"
+Ref: "Catalogo"."Producto"."IDMarca" > "Catalogo"."Marca"."IDMarca"
+Ref: "Catalogo"."Producto"."IDImpuesto" > "Catalogo"."Impuesto"."IDImpuesto"
+Ref: "Catalogo"."Variante"."IDProducto" > "Catalogo"."Producto"."IDProducto"
+Ref: "Catalogo"."ValorAtributo"."IDAtributo" > "Catalogo"."Atributo"."IDAtributo"
+Ref: "Catalogo"."VarianteValorAtributo"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Catalogo"."VarianteValorAtributo"."IDValorAtributo" > "Catalogo"."ValorAtributo"."IDValorAtributo"
+Ref: "Catalogo"."EspecificacionProducto"."IDProducto" > "Catalogo"."Producto"."IDProducto"
+Ref: "Catalogo"."EspecificacionProducto"."IDValorAtributo" > "Catalogo"."ValorAtributo"."IDValorAtributo"
+Ref: "Catalogo"."ImagenProducto"."IDProducto" > "Catalogo"."Producto"."IDProducto"
+Ref: "Catalogo"."ImagenProducto"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Catalogo"."PrecioVariante"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Catalogo"."PrecioVariante"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Inventario"."Sucursal"."IDMunicipio" > "Clientes"."Municipio"."IDMunicipio"
+Ref: "Inventario"."Bodega"."IDSucursal" > "Inventario"."Sucursal"."IDSucursal"
+Ref: "Inventario"."Existencia"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Inventario"."Existencia"."IDBodega" > "Inventario"."Bodega"."IDBodega"
+Ref: "Inventario"."Kardex"."IDTipoMovimiento" > "Inventario"."TipoMovimiento"."IDTipoMovimiento"
+Ref: "Inventario"."Kardex"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Inventario"."Kardex".("IDVariante", "IDBodega") > "Inventario"."Existencia".("IDVariante", "IDBodega")
+Ref: "Marketing"."Cupon"."IDCategoria" > "Catalogo"."Categoria"."IDCategoria"
+Ref: "Marketing"."PromocionAlcance"."IDPromocion" > "Marketing"."Promocion"."IDPromocion"
+Ref: "Marketing"."PromocionAlcance"."IDCategoria" > "Catalogo"."Categoria"."IDCategoria"
+Ref: "Marketing"."PromocionAlcance"."IDMarca" > "Catalogo"."Marca"."IDMarca"
+Ref: "Marketing"."PromocionAlcance"."IDProducto" > "Catalogo"."Producto"."IDProducto"
+Ref: "Marketing"."PromocionAlcance"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Marketing"."Anuncio"."IDZonaAnuncio" > "Marketing"."ZonaAnuncio"."IDZonaAnuncio"
+Ref: "Marketing"."Anuncio"."IDPromocion" > "Marketing"."Promocion"."IDPromocion"
+Ref: "Marketing"."AnuncioMetrica"."IDAnuncio" > "Marketing"."Anuncio"."IDAnuncio"
+Ref: "Ventas"."TarifaEnvio"."IDMetodoEnvio" > "Ventas"."MetodoEnvio"."IDMetodoEnvio"
+Ref: "Ventas"."TarifaEnvio"."IDDepartamento" > "Clientes"."Departamento"."IDDepartamento"
+Ref: "Ventas"."Carrito"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."Carrito"."IDCupon" > "Marketing"."Cupon"."IDCupon"
+Ref: "Ventas"."CarritoDetalle"."IDCarrito" > "Ventas"."Carrito"."IDCarrito"
+Ref: "Ventas"."CarritoDetalle"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Ventas"."Checkout"."IDCarrito" > "Ventas"."Carrito"."IDCarrito"
+Ref: "Ventas"."Checkout"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."Checkout"."IDMetodoEnvio" > "Ventas"."MetodoEnvio"."IDMetodoEnvio"
+Ref: "Ventas"."Checkout"."IDDireccion" > "Clientes"."Direccion"."IDDireccion"
+Ref: "Ventas"."Checkout"."IDSucursalRecoger" > "Inventario"."Sucursal"."IDSucursal"
+Ref: "Ventas"."Checkout"."IDCupon" > "Marketing"."Cupon"."IDCupon"
+Ref: "Ventas"."CheckoutDetalle"."IDCheckout" > "Ventas"."Checkout"."IDCheckout"
+Ref: "Ventas"."CheckoutDetalle"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Ventas"."CheckoutDetalle"."IDPromocion" > "Marketing"."Promocion"."IDPromocion"
+Ref: "Inventario"."Reserva"."IDCheckout" > "Ventas"."Checkout"."IDCheckout"
+Ref: "Inventario"."Reserva".("IDVariante", "IDBodega") > "Inventario"."Existencia".("IDVariante", "IDBodega")
+Ref: "Ventas"."TransicionEstadoPedido"."IDEstadoOrigen" > "Ventas"."EstadoPedido"."IDEstadoPedido"
+Ref: "Ventas"."TransicionEstadoPedido"."IDEstadoDestino" > "Ventas"."EstadoPedido"."IDEstadoPedido"
+Ref: "Ventas"."Pedido"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."Pedido"."IDCheckout" - "Ventas"."Checkout"."IDCheckout"
+Ref: "Ventas"."Pedido"."IDEstadoPedido" > "Ventas"."EstadoPedido"."IDEstadoPedido"
+Ref: "Ventas"."Pedido"."IDMetodoEnvio" > "Ventas"."MetodoEnvio"."IDMetodoEnvio"
+Ref: "Ventas"."Pedido"."IDSucursalRecoger" > "Inventario"."Sucursal"."IDSucursal"
+Ref: "Ventas"."Pedido"."IDCupon" > "Marketing"."Cupon"."IDCupon"
+Ref: "Ventas"."PedidoDetalle"."IDPedido" > "Ventas"."Pedido"."IDPedido"
+Ref: "Ventas"."PedidoDetalle"."IDVariante" > "Catalogo"."Variante"."IDVariante"
+Ref: "Ventas"."PedidoDetalle"."IDPromocion" > "Marketing"."Promocion"."IDPromocion"
+Ref: "Ventas"."PedidoAsignacion"."IDPedidoDetalle" > "Ventas"."PedidoDetalle"."IDPedidoDetalle"
+Ref: "Ventas"."PedidoAsignacion"."IDBodega" > "Inventario"."Bodega"."IDBodega"
+Ref: "Ventas"."PedidoDireccion"."IDPedido" - "Ventas"."Pedido"."IDPedido"
+Ref: "Ventas"."PedidoDireccion"."IDMunicipio" > "Clientes"."Municipio"."IDMunicipio"
+Ref: "Ventas"."PedidoHistorialEstado"."IDPedido" > "Ventas"."Pedido"."IDPedido"
+Ref: "Ventas"."PedidoHistorialEstado"."IDEstadoAnterior" > "Ventas"."EstadoPedido"."IDEstadoPedido"
+Ref: "Ventas"."PedidoHistorialEstado"."IDEstadoNuevo" > "Ventas"."EstadoPedido"."IDEstadoPedido"
+Ref: "Ventas"."PedidoHistorialEstado"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."Pago"."IDCheckout" > "Ventas"."Checkout"."IDCheckout"
+Ref: "Ventas"."Pago"."IDMetodoPago" > "Ventas"."MetodoPago"."IDMetodoPago"
+Ref: "Ventas"."CuponUso"."IDCupon" > "Marketing"."Cupon"."IDCupon"
+Ref: "Ventas"."CuponUso"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."CuponUso"."IDCheckout" - "Ventas"."Checkout"."IDCheckout"
+Ref: "Ventas"."CuponUso"."IDPedido" > "Ventas"."Pedido"."IDPedido"
+Ref: "Ventas"."SolicitudIdempotente"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."Devolucion"."IDPedido" > "Ventas"."Pedido"."IDPedido"
+Ref: "Ventas"."Devolucion"."IDUsuario" > "Seguridad"."Usuario"."IDUsuario"
+Ref: "Ventas"."DevolucionDetalle"."IDDevolucion" > "Ventas"."Devolucion"."IDDevolucion"
+Ref: "Ventas"."DevolucionDetalle"."IDPedidoDetalle" > "Ventas"."PedidoDetalle"."IDPedidoDetalle"
+Ref: "Ventas"."DevolucionDetalle"."IDBodega" > "Inventario"."Bodega"."IDBodega"
+Ref: "Ventas"."Reembolso"."IDPedido" > "Ventas"."Pedido"."IDPedido"
+Ref: "Ventas"."Reembolso"."IDDevolucion" > "Ventas"."Devolucion"."IDDevolucion"
+Ref: "Ventas"."Factura"."IDPedido" - "Ventas"."Pedido"."IDPedido"
+Ref: "Inventario"."Kardex"."IDPedidoDetalle" > "Ventas"."PedidoDetalle"."IDPedidoDetalle"
+
+TableGroup Config {
+  "Config"."Parametro"
+  "Config"."ErrorNegocio"
+}
+
+TableGroup Seguridad {
+  "Seguridad"."Rol"
+  "Seguridad"."Permiso"
+  "Seguridad"."RolPermiso"
+  "Seguridad"."Usuario"
+  "Seguridad"."TokenRefresco"
+}
+
+TableGroup Clientes {
+  "Clientes"."Departamento"
+  "Clientes"."Municipio"
+  "Clientes"."Direccion"
+  "Clientes"."DatoFiscal"
+}
+
+TableGroup Auditoria {
+  "Auditoria"."Bitacora"
+  "Auditoria"."ProteccionBitacora"
+  "Auditoria"."ErrorBD"
+  "Auditoria"."CambioEsquema"
+}
+
+TableGroup Catalogo {
+  "Catalogo"."Impuesto"
+  "Catalogo"."TasaImpuesto"
+  "Catalogo"."Categoria"
+  "Catalogo"."Marca"
+  "Catalogo"."Producto"
+  "Catalogo"."Variante"
+  "Catalogo"."Atributo"
+  "Catalogo"."ValorAtributo"
+  "Catalogo"."VarianteValorAtributo"
+  "Catalogo"."EspecificacionProducto"
+  "Catalogo"."ImagenProducto"
+  "Catalogo"."PrecioVariante"
+}
+
+TableGroup Inventario {
+  "Inventario"."Sucursal"
+  "Inventario"."Bodega"
+  "Inventario"."Existencia"
+  "Inventario"."TipoMovimiento"
+  "Inventario"."Kardex"
+  "Inventario"."Reserva"
+}
+
+TableGroup Marketing {
+  "Marketing"."Cupon"
+  "Marketing"."Promocion"
+  "Marketing"."PromocionAlcance"
+  "Marketing"."ZonaAnuncio"
+  "Marketing"."Anuncio"
+  "Marketing"."AnuncioMetrica"
+}
+
+TableGroup Ventas {
+  "Ventas"."MetodoEnvio"
+  "Ventas"."TarifaEnvio"
+  "Ventas"."MetodoPago"
+  "Ventas"."Carrito"
+  "Ventas"."CarritoDetalle"
+  "Ventas"."Checkout"
+  "Ventas"."CheckoutDetalle"
+  "Ventas"."EstadoPedido"
+  "Ventas"."TransicionEstadoPedido"
+  "Ventas"."Pedido"
+  "Ventas"."PedidoDetalle"
+  "Ventas"."PedidoAsignacion"
+  "Ventas"."PedidoDireccion"
+  "Ventas"."PedidoHistorialEstado"
+  "Ventas"."Pago"
+  "Ventas"."CuponUso"
+  "Ventas"."SolicitudIdempotente"
+  "Ventas"."Devolucion"
+  "Ventas"."DevolucionDetalle"
+  "Ventas"."Reembolso"
+  "Ventas"."Factura"
+  "Ventas"."EventoSalida"
+}
