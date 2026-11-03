@@ -24,6 +24,17 @@ BEGIN
     END CATCH
 END;
 GO
+-- El logout llega solo con la cookie: el access token pudo haber expirado.
+CREATE OR ALTER PROCEDURE Api.SP_Seguridad_CerrarSesion @HashToken BINARY(32)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE t SET RevocadoEn = SYSUTCDATETIME()
+    FROM Seguridad.TokenRefresco t
+    JOIN Seguridad.TokenRefresco a ON a.Familia = t.Familia
+    WHERE a.HashToken = @HashToken AND t.RevocadoEn IS NULL;
+END;
+GO
 CREATE OR ALTER PROCEDURE Api.SP_Seguridad_ObtenerCredencialesPorId @IDUsuario INT
 AS
 BEGIN

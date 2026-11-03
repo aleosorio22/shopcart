@@ -108,6 +108,7 @@ function crearManejador(definicion: RutaDefinida, autenticador: Autenticador): R
   return async (req, res) => {
     const usuario = await resolverUsuario(req, acceso, autenticador);
     if (permiso && !usuario?.permisos.includes(permiso)) throw AppError.prohibido();
+    const idempotencia = idempotente ? leerIdempotencia(req) : undefined;
 
     const resultado = await definicion.manejar({
       body: validar(definicion.body, req.body),
@@ -118,9 +119,7 @@ function crearManejador(definicion: RutaDefinida, autenticador: Autenticador): R
         if (!usuario) throw AppError.noAutenticado();
         return usuario.idUsuario;
       },
-      get idempotencia() {
-        return leerIdempotencia(req);
-      },
+      idempotencia: idempotencia as Idempotencia,
       req,
       res,
     });
