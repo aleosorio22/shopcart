@@ -1,0 +1,25 @@
+meta {
+  name: Cambiar precio
+  type: http
+  seq: 19
+}
+
+put {
+  url: {{baseUrl}}/api/v1/catalogo/variantes/:id/precio
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "precio": 100
+  }
+}
+
+docs {
+  Cambiar precio (PRECIOS_GESTIONAR)
+}

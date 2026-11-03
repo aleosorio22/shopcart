@@ -1,0 +1,25 @@
+meta {
+  name: Crear cupon
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/cupones
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "codigo": "EJEMPLO10",
+    "tipoDescuento": "PORCENTAJE",
+    "valor": 10,
+    "vigenteDesde": "2026-01-01T00:00:00.000Z",
+    "vigenteHasta": "2027-01-01T00:00:00.000Z"
+  }
+}
+
+docs {
+  Crear cupon (CUPONES_GESTIONAR)
+}

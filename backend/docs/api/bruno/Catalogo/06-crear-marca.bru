@@ -1,0 +1,22 @@
+meta {
+  name: Crear marca
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/marcas
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api"
+  }
+}
+
+docs {
+  Crear marca (CATALOGO_GESTIONAR)
+}

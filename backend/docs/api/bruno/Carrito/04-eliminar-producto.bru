@@ -1,0 +1,19 @@
+meta {
+  name: Eliminar producto
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/carrito/items/:idVariante
+  body: none
+  auth: inherit
+}
+
+params:path {
+  idVariante: 1
+}
+
+docs {
+  Eliminar producto
+}

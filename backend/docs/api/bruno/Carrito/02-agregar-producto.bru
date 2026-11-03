@@ -1,0 +1,21 @@
+meta {
+  name: Agregar producto
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/carrito/items
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idVariante": 1
+  }
+}
+
+docs {
+  Agregar producto
+}

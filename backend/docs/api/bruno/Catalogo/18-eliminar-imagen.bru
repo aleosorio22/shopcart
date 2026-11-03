@@ -1,0 +1,19 @@
+meta {
+  name: Eliminar imagen
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/catalogo/imagenes/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Eliminar imagen (CATALOGO_GESTIONAR)
+}

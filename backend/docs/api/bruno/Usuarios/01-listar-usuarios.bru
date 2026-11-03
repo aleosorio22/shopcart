@@ -1,0 +1,23 @@
+meta {
+  name: Listar usuarios
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/usuarios
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~texto: Ejemplo
+  ~rol: CLIENTE
+  ~activo: true
+}
+
+docs {
+  Listar usuarios (USUARIOS_GESTIONAR)
+}

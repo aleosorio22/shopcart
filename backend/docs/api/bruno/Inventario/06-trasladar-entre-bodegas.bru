@@ -1,0 +1,25 @@
+meta {
+  name: Trasladar entre bodegas
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/v1/inventario/traslados
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idVariante": 1,
+    "idBodegaOrigen": 1,
+    "idBodegaDestino": 1,
+    "cantidad": 1,
+    "motivo": "Ejemplo"
+  }
+}
+
+docs {
+  Trasladar entre bodegas (INVENTARIO_GESTIONAR)
+}

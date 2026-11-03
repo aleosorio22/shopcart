@@ -1,0 +1,26 @@
+meta {
+  name: Listar pedidos con filtros
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/pedidos
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~estado: EN_PREPARACION
+  ~idUsuario: 1
+  ~textoCliente: Ejemplo
+  ~desde: 2026-09-01
+  ~hasta: 2026-12-31
+  ~orden: FECHA_DESC
+}
+
+docs {
+  Listar pedidos con filtros (PEDIDOS_GESTIONAR)
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Editar direccion propia
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/v1/clientes/direcciones/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "idMunicipio": 1,
+    "alias": "Ejemplo",
+    "destinatario": "Ejemplo",
+    "telefono": "55550000",
+    "linea1": "Ejemplo"
+  }
+}
+
+docs {
+  Editar direccion propia
+}

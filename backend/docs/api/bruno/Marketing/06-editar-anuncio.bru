@@ -1,0 +1,30 @@
+meta {
+  name: Editar anuncio
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/v1/marketing/anuncios/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "codigoZona": "HOME_HERO",
+    "titulo": "Ejemplo",
+    "imagenEscritorioUrl": "Ejemplo",
+    "urlDestino": "Ejemplo",
+    "vigenteDesde": "2026-01-01T00:00:00.000Z",
+    "vigenteHasta": "2027-01-01T00:00:00.000Z"
+  }
+}
+
+docs {
+  Editar anuncio (MARKETING_GESTIONAR)
+}

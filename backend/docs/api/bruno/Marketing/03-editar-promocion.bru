@@ -1,0 +1,35 @@
+meta {
+  name: Editar promocion
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/v1/marketing/promociones/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api",
+    "tipoDescuento": "PORCENTAJE",
+    "valor": 10,
+    "vigenteDesde": "2026-01-01T00:00:00.000Z",
+    "vigenteHasta": "2027-01-01T00:00:00.000Z",
+    "alcance": [
+      {
+        "idMarca": 1
+      }
+    ]
+  }
+}
+
+docs {
+  Editar promocion (MARKETING_GESTIONAR)
+}

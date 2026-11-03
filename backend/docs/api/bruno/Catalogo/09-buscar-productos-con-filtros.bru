@@ -1,0 +1,28 @@
+meta {
+  name: Buscar productos con filtros
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/v1/catalogo/productos
+  body: none
+  auth: none
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~texto: Ejemplo
+  ~idCategoria: 1
+  ~idMarca: 1
+  ~precioMinimo: 1
+  ~precioMaximo: 1
+  ~soloDisponibles: true
+  ~soloEnOferta: true
+  ~orden: RECIENTES
+}
+
+docs {
+  Buscar productos con filtros
+}

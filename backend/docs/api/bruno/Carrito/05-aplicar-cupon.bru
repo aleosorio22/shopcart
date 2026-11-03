@@ -1,0 +1,21 @@
+meta {
+  name: Aplicar cupon
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/carrito/cupon
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "codigo": "EJEMPLO10"
+  }
+}
+
+docs {
+  Aplicar cupon
+}

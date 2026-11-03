@@ -1,0 +1,26 @@
+meta {
+  name: Editar marca
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/api/v1/catalogo/marcas/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api"
+  }
+}
+
+docs {
+  Editar marca (CATALOGO_GESTIONAR)
+}

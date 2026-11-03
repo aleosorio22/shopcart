@@ -1,0 +1,25 @@
+meta {
+  name: Avanzar estado
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/pedidos/:id/estado
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "estado": "EN_PREPARACION"
+  }
+}
+
+docs {
+  Avanzar estado (PEDIDOS_GESTIONAR)
+}

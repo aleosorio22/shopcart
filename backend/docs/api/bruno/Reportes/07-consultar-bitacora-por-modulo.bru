@@ -1,0 +1,25 @@
+meta {
+  name: Consultar bitacora por modulo
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reportes/bitacora
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~modulo: Ejemplo
+  ~entidad: Ejemplo
+  ~idEntidad: 1
+  ~desde: 2026-09-01
+  ~hasta: 2026-12-31
+}
+
+docs {
+  Consultar bitacora por modulo (BITACORA_VER)
+}

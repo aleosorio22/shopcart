@@ -1,0 +1,29 @@
+meta {
+  name: Editar cupon
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/v1/cupones/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "codigo": "EJEMPLO10",
+    "tipoDescuento": "PORCENTAJE",
+    "valor": 10,
+    "vigenteDesde": "2026-01-01T00:00:00.000Z",
+    "vigenteHasta": "2027-01-01T00:00:00.000Z"
+  }
+}
+
+docs {
+  Editar cupon (CUPONES_GESTIONAR)
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Crear anuncio
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/marketing/anuncios
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "codigoZona": "HOME_HERO",
+    "titulo": "Ejemplo",
+    "imagenEscritorioUrl": "Ejemplo",
+    "urlDestino": "Ejemplo",
+    "vigenteDesde": "2026-01-01T00:00:00.000Z",
+    "vigenteHasta": "2027-01-01T00:00:00.000Z"
+  }
+}
+
+docs {
+  Crear anuncio (MARKETING_GESTIONAR)
+}

@@ -1,0 +1,31 @@
+meta {
+  name: Registrar devolucion total o parcial
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/v1/pedidos/:id/devoluciones
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "motivo": "Ejemplo",
+    "lineas": [
+      {
+        "idPedidoDetalle": 1,
+        "cantidad": 1
+      }
+    ]
+  }
+}
+
+docs {
+  Registrar devolucion total o parcial (PEDIDOS_GESTIONAR)
+}

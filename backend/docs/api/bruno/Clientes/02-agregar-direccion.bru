@@ -1,0 +1,25 @@
+meta {
+  name: Agregar direccion
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/clientes/direcciones
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idMunicipio": 1,
+    "alias": "Ejemplo",
+    "destinatario": "Ejemplo",
+    "telefono": "55550000",
+    "linea1": "Ejemplo"
+  }
+}
+
+docs {
+  Agregar direccion
+}

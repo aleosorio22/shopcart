@@ -1,0 +1,21 @@
+meta {
+  name: Listar reembolsos
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/pedidos/reembolsos
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~estado: EN_PREPARACION
+}
+
+docs {
+  Listar reembolsos (PEDIDOS_GESTIONAR)
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Registrar impresion o clic
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/v1/marketing/anuncios/:id/eventos
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "evento": "IMPRESION"
+  }
+}
+
+docs {
+  Registrar impresion o clic
+}

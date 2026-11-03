@@ -1,0 +1,26 @@
+meta {
+  name: Editar bodega
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/api/v1/inventario/bodegas/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "codigo": "EJEMPLO10",
+    "nombre": "Ejemplo"
+  }
+}
+
+docs {
+  Editar bodega (CONFIG_GESTIONAR)
+}

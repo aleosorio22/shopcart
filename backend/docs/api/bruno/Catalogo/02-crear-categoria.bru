@@ -1,0 +1,22 @@
+meta {
+  name: Crear categoria
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/categorias
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api"
+  }
+}
+
+docs {
+  Crear categoria (CATALOGO_GESTIONAR)
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Sucursales con disponibilidad opcional
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/v1/inventario/sucursales
+  body: none
+  auth: none
+}
+
+params:query {
+  ~soloRecoger: true
+  ~idVariante: 1
+}
+
+docs {
+  Sucursales, con disponibilidad opcional
+}

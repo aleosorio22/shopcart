@@ -1,0 +1,20 @@
+meta {
+  name: Mis pedidos
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/pedidos/mios
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+}
+
+docs {
+  Mis pedidos
+}

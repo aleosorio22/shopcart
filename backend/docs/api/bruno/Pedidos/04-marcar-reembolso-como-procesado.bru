@@ -1,0 +1,25 @@
+meta {
+  name: Marcar reembolso como procesado
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/pedidos/reembolsos/:id/procesar
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "referencia": "REF-001"
+  }
+}
+
+docs {
+  Marcar reembolso como procesado (PEDIDOS_GESTIONAR)
+}

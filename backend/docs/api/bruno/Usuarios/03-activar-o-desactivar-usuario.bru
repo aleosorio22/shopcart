@@ -1,0 +1,25 @@
+meta {
+  name: Activar o desactivar usuario
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/usuarios/:id/estado
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "activo": true
+  }
+}
+
+docs {
+  Activar o desactivar usuario (USUARIOS_GESTIONAR)
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Cancelar checkout y liberar la reserva
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/checkout/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: {{idCheckout}}
+}
+
+docs {
+  Cancelar checkout y liberar la reserva
+}

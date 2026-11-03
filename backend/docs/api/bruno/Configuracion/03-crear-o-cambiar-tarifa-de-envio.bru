@@ -1,0 +1,24 @@
+meta {
+  name: Crear o cambiar tarifa de envio
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/v1/configuracion/tarifas-envio
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idMetodoEnvio": 1,
+    "idDepartamento": 1,
+    "costo": 25,
+    "diasEstimados": 2
+  }
+}
+
+docs {
+  Crear o cambiar tarifa de envio (CONFIG_GESTIONAR)
+}

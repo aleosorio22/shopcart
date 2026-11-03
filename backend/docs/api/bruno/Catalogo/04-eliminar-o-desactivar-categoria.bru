@@ -1,0 +1,19 @@
+meta {
+  name: Eliminar o desactivar categoria
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/catalogo/categorias/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Eliminar o desactivar categoria (CATALOGO_GESTIONAR)
+}

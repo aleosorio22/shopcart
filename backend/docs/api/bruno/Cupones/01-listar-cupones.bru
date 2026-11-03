@@ -1,0 +1,22 @@
+meta {
+  name: Listar cupones
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/cupones
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~texto: Ejemplo
+  ~activo: true
+}
+
+docs {
+  Listar cupones (CUPONES_GESTIONAR)
+}

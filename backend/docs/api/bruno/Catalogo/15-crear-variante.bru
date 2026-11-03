@@ -1,0 +1,25 @@
+meta {
+  name: Crear variante
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/productos/:id/variantes
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "sku": "EJ-001"
+  }
+}
+
+docs {
+  Crear variante (CATALOGO_GESTIONAR)
+}

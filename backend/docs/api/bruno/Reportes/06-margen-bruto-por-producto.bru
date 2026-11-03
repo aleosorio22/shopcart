@@ -1,0 +1,22 @@
+meta {
+  name: Margen bruto por producto
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reportes/dashboard/margen?desde=2026-09-01&hasta=2026-12-31
+  body: none
+  auth: inherit
+}
+
+params:query {
+  desde: 2026-09-01
+  hasta: 2026-12-31
+  ~pagina: 1
+  ~tamanoPagina: 20
+}
+
+docs {
+  Margen bruto por producto (REPORTES_VER)
+}

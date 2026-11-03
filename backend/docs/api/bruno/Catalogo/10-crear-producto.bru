@@ -1,0 +1,23 @@
+meta {
+  name: Crear producto
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/productos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idCategoria": 1,
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api"
+  }
+}
+
+docs {
+  Crear producto (CATALOGO_GESTIONAR)
+}

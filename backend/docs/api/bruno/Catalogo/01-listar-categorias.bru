@@ -1,0 +1,19 @@
+meta {
+  name: Listar categorias
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/catalogo/categorias
+  body: none
+  auth: none
+}
+
+params:query {
+  ~incluirInactivas: true
+}
+
+docs {
+  Listar categorias
+}

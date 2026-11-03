@@ -1,0 +1,24 @@
+meta {
+  name: Crear sucursal
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/v1/inventario/sucursales
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "codigo": "EJEMPLO10",
+    "nombre": "Ejemplo",
+    "idMunicipio": 1,
+    "direccion": "Ejemplo"
+  }
+}
+
+docs {
+  Crear sucursal (CONFIG_GESTIONAR)
+}

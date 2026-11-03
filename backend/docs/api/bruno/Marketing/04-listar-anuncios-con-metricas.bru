@@ -1,0 +1,20 @@
+meta {
+  name: Listar anuncios con metricas
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/marketing/anuncios
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+}
+
+docs {
+  Listar anuncios con metricas (MARKETING_GESTIONAR)
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Detalle e historial solo el dueno o personal
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/pedidos/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Detalle e historial; solo el dueno o personal
+}

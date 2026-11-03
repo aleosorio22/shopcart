@@ -1,0 +1,26 @@
+meta {
+  name: Editar variante
+  type: http
+  seq: 16
+}
+
+put {
+  url: {{baseUrl}}/api/v1/catalogo/productos/:id/variantes/:idVariante
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+  idVariante: 1
+}
+
+body:json {
+  {
+    "sku": "EJ-001"
+  }
+}
+
+docs {
+  Editar variante (CATALOGO_GESTIONAR)
+}

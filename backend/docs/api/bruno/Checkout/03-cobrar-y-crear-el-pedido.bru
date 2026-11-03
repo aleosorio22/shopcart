@@ -1,0 +1,31 @@
+meta {
+  name: Cobrar y crear el pedido
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/checkout/:id/pagar
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: {{idCheckout}}
+}
+
+headers {
+  Idempotency-Key: {{idempotencyKey}}
+}
+
+body:json {
+  {
+    "idMetodoPago": 1,
+    "tokenPago": "tok_visa",
+    "nitFactura": "CF"
+  }
+}
+
+docs {
+  Cobrar y crear el pedido
+}

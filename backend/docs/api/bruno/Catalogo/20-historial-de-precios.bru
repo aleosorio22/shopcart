@@ -1,0 +1,19 @@
+meta {
+  name: Historial de precios
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/api/v1/catalogo/variantes/:id/precios
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Historial de precios (PRECIOS_GESTIONAR)
+}

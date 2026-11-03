@@ -1,0 +1,19 @@
+meta {
+  name: Dar de baja producto
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/catalogo/productos/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Dar de baja producto (CATALOGO_GESTIONAR)
+}

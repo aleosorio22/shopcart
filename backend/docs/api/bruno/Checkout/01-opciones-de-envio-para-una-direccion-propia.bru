@@ -1,0 +1,19 @@
+meta {
+  name: Opciones de envio para una direccion propia
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/checkout/envios
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~idDireccion: 1
+}
+
+docs {
+  Opciones de envio para una direccion propia
+}

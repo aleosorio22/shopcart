@@ -1,0 +1,20 @@
+meta {
+  name: Ventas por categoria
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reportes/dashboard/categorias?desde=2026-09-01&hasta=2026-12-31
+  body: none
+  auth: inherit
+}
+
+params:query {
+  desde: 2026-09-01
+  hasta: 2026-12-31
+}
+
+docs {
+  Ventas por categoria (REPORTES_VER)
+}

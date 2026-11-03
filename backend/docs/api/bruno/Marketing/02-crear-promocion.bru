@@ -1,0 +1,31 @@
+meta {
+  name: Crear promocion
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/marketing/promociones
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api",
+    "tipoDescuento": "PORCENTAJE",
+    "valor": 10,
+    "vigenteDesde": "2026-01-01T00:00:00.000Z",
+    "vigenteHasta": "2027-01-01T00:00:00.000Z",
+    "alcance": [
+      {
+        "idMarca": 1
+      }
+    ]
+  }
+}
+
+docs {
+  Crear promocion (MARKETING_GESTIONAR)
+}

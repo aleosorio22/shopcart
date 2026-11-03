@@ -1,0 +1,25 @@
+meta {
+  name: Modificar cantidad
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/carrito/items/:idVariante
+  body: json
+  auth: inherit
+}
+
+params:path {
+  idVariante: 1
+}
+
+body:json {
+  {
+    "cantidad": 1
+  }
+}
+
+docs {
+  Modificar cantidad
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Anuncios visibles en una zona
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/marketing/anuncios/vigentes?zona=HOME_HERO
+  body: none
+  auth: none
+}
+
+params:query {
+  zona: HOME_HERO
+}
+
+docs {
+  Anuncios visibles en una zona
+}

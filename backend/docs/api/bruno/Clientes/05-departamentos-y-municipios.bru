@@ -1,0 +1,19 @@
+meta {
+  name: Departamentos y municipios
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/clientes/municipios
+  body: none
+  auth: none
+}
+
+params:query {
+  ~idDepartamento: 1
+}
+
+docs {
+  Departamentos y municipios
+}

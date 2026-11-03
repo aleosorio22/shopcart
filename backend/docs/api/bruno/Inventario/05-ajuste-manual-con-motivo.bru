@@ -1,0 +1,24 @@
+meta {
+  name: Ajuste manual con motivo
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/inventario/ajustes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idVariante": 1,
+    "idBodega": 1,
+    "cantidad": 1,
+    "motivo": "Ejemplo"
+  }
+}
+
+docs {
+  Ajuste manual con motivo (INVENTARIO_GESTIONAR)
+}

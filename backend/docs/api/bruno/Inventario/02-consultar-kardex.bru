@@ -1,0 +1,24 @@
+meta {
+  name: Consultar kardex
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/inventario/kardex
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~idVariante: 1
+  ~idBodega: 1
+  ~desde: 2026-09-01
+  ~hasta: 2026-12-31
+}
+
+docs {
+  Consultar kardex (INVENTARIO_GESTIONAR)
+}

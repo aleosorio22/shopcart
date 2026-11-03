@@ -1,0 +1,28 @@
+meta {
+  name: Editar sucursal
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{baseUrl}}/api/v1/inventario/sucursales/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "codigo": "EJEMPLO10",
+    "nombre": "Ejemplo",
+    "idMunicipio": 1,
+    "direccion": "Ejemplo"
+  }
+}
+
+docs {
+  Editar sucursal (CONFIG_GESTIONAR)
+}

@@ -1,0 +1,20 @@
+meta {
+  name: KPI ventas pedidos ticket promedio
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reportes/dashboard/resumen?desde=2026-09-01&hasta=2026-12-31
+  body: none
+  auth: inherit
+}
+
+params:query {
+  desde: 2026-09-01
+  hasta: 2026-12-31
+}
+
+docs {
+  KPI: ventas, pedidos, ticket promedio (REPORTES_VER)
+}

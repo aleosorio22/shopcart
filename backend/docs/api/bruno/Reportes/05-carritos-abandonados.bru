@@ -1,0 +1,20 @@
+meta {
+  name: Carritos abandonados
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reportes/dashboard/carritos-abandonados
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+}
+
+docs {
+  Carritos abandonados (REPORTES_VER)
+}

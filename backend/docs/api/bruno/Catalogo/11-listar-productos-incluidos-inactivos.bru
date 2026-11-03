@@ -1,0 +1,23 @@
+meta {
+  name: Listar productos incluidos inactivos
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/v1/catalogo/admin/productos
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~pagina: 1
+  ~tamanoPagina: 20
+  ~texto: Ejemplo
+  ~idCategoria: 1
+  ~activo: true
+}
+
+docs {
+  Listar productos, incluidos inactivos (CATALOGO_GESTIONAR)
+}

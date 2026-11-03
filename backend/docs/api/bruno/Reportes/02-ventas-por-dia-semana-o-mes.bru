@@ -1,0 +1,21 @@
+meta {
+  name: Ventas por dia semana o mes
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/reportes/dashboard/ventas?desde=2026-09-01&hasta=2026-12-31
+  body: none
+  auth: inherit
+}
+
+params:query {
+  desde: 2026-09-01
+  hasta: 2026-12-31
+  ~agrupacion: DIA
+}
+
+docs {
+  Ventas por dia, semana o mes (REPORTES_VER)
+}

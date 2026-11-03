@@ -1,0 +1,26 @@
+meta {
+  name: Editar categoria
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/v1/catalogo/categorias/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api"
+  }
+}
+
+docs {
+  Editar categoria (CATALOGO_GESTIONAR)
+}

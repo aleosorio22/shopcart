@@ -1,0 +1,25 @@
+meta {
+  name: Cancelar antes del despacho
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/pedidos/:id/cancelar
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "motivo": "Ejemplo"
+  }
+}
+
+docs {
+  Cancelar antes del despacho
+}

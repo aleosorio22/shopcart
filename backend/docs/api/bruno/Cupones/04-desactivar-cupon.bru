@@ -1,0 +1,19 @@
+meta {
+  name: Desactivar cupon
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/cupones/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  Desactivar cupon (CUPONES_GESTIONAR)
+}

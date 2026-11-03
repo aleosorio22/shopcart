@@ -1,0 +1,15 @@
+meta {
+  name: Perfil y permisos del usuario
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/auth/me
+  body: none
+  auth: inherit
+}
+
+docs {
+  Perfil y permisos del usuario
+}

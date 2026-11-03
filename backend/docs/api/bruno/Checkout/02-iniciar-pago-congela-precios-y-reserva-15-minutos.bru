@@ -1,0 +1,32 @@
+meta {
+  name: Iniciar pago congela precios y reserva 15 minutos
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/checkout
+  body: json
+  auth: inherit
+}
+
+headers {
+  Idempotency-Key: {{idempotencyKey}}
+}
+
+body:json {
+  {
+    "idMetodoEnvio": 1,
+    "idDireccion": 1
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar('idCheckout', res.body.data.IDCheckout);
+  }
+}
+
+docs {
+  Iniciar pago: congela precios y reserva 15 minutos
+}

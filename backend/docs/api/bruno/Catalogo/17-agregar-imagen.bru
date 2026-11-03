@@ -1,0 +1,25 @@
+meta {
+  name: Agregar imagen
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/productos/:id/imagenes
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "url": "https://example.com/imagen.webp"
+  }
+}
+
+docs {
+  Agregar imagen (CATALOGO_GESTIONAR)
+}

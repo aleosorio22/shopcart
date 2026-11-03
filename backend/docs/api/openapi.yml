@@ -1,0 +1,3726 @@
+openapi: 3.0.3
+info:
+  title: ShopCart API
+  version: 1.0.0
+  description: "Respuesta correcta: { success, data, meta? }. Error: { success:
+    false, error: { codigo, mensaje, detalles?, requestId } }."
+servers:
+  - url: http://localhost:3000
+    description: Local
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /api/v1/auth/registro:
+    post:
+      tags:
+        - Autenticacion
+      summary: Registrar cliente
+      security: &a1 []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  maxLength: 254
+                contrasena:
+                  type: string
+                  minLength: 10
+                nombres:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                apellidos:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                telefono:
+                  type: string
+                  pattern: ^\+?\d{8,15}$
+              required:
+                - correo
+                - contrasena
+                - nombres
+                - apellidos
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Autenticacion
+      summary: Iniciar sesion
+      security: *a1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  maxLength: 254
+                contrasena:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+              required:
+                - correo
+                - contrasena
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/auth/refresh:
+    post:
+      tags:
+        - Autenticacion
+      summary: Renovar el access token y rotar el refresh token
+      security: *a1
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Autenticacion
+      summary: Cerrar sesion
+      security: *a1
+      parameters: []
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/auth/me:
+    get:
+      tags:
+        - Autenticacion
+      summary: Perfil y permisos del usuario
+      security: &a2
+        - bearer: []
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    patch:
+      tags:
+        - Autenticacion
+      summary: Actualizar perfil
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombres:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                apellidos:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                telefono:
+                  type: string
+                  pattern: ^\+?\d{8,15}$
+              required:
+                - nombres
+                - apellidos
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/auth/cambiar-contrasena:
+    post:
+      tags:
+        - Autenticacion
+      summary: Cambiar contrasena y cerrar las demas sesiones
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actual:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                nueva:
+                  type: string
+                  minLength: 10
+              required:
+                - actual
+                - nueva
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Listar usuarios (USUARIOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: texto
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: rol
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - CLIENTE
+              - OPERADOR
+              - ADMINISTRADOR
+        - name: activo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Usuarios
+      summary: Crear usuario interno (USUARIOS_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  maxLength: 254
+                contrasena:
+                  type: string
+                  minLength: 10
+                  maxLength: 72
+                nombres:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                apellidos:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                rol:
+                  type: string
+                  enum:
+                    - CLIENTE
+                    - OPERADOR
+                    - ADMINISTRADOR
+              required:
+                - correo
+                - contrasena
+                - nombres
+                - apellidos
+                - rol
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/usuarios/{id}/estado:
+    patch:
+      tags:
+        - Usuarios
+      summary: Activar o desactivar usuario (USUARIOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                activo:
+                  type: boolean
+              required:
+                - activo
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/clientes/direcciones:
+    get:
+      tags:
+        - Clientes
+      summary: Mis direcciones
+      security: *a2
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Clientes
+      summary: Agregar direccion
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idMunicipio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                alias:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+                destinatario:
+                  type: string
+                  minLength: 1
+                  maxLength: 150
+                telefono:
+                  type: string
+                  pattern: ^\+?\d{8,15}$
+                linea1:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                linea2:
+                  type: string
+                  maxLength: 200
+                referencia:
+                  type: string
+                  maxLength: 300
+                esPredeterminada:
+                  default: false
+                  type: boolean
+              required:
+                - idMunicipio
+                - alias
+                - destinatario
+                - telefono
+                - linea1
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/clientes/direcciones/{id}:
+    put:
+      tags:
+        - Clientes
+      summary: Editar direccion propia
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idMunicipio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                alias:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+                destinatario:
+                  type: string
+                  minLength: 1
+                  maxLength: 150
+                telefono:
+                  type: string
+                  pattern: ^\+?\d{8,15}$
+                linea1:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                linea2:
+                  type: string
+                  maxLength: 200
+                referencia:
+                  type: string
+                  maxLength: 300
+                esPredeterminada:
+                  default: false
+                  type: boolean
+              required:
+                - idMunicipio
+                - alias
+                - destinatario
+                - telefono
+                - linea1
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    delete:
+      tags:
+        - Clientes
+      summary: Desactivar direccion propia
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/clientes/municipios:
+    get:
+      tags:
+        - Clientes
+      summary: Departamentos y municipios
+      security: *a1
+      parameters:
+        - name: idDepartamento
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/clientes/datos-fiscales:
+    get:
+      tags:
+        - Clientes
+      summary: Mis datos de facturacion
+      security: *a2
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Clientes
+      summary: Guardar datos de facturacion
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nit:
+                  type: string
+                  pattern: ^(CF|\d{1,14}[0-9Kk]?)$
+                nombreFiscal:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+              required:
+                - nit
+                - nombreFiscal
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/categorias:
+    get:
+      tags:
+        - Catalogo
+      summary: Listar categorias
+      security: *a1
+      parameters:
+        - name: incluirInactivas
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+    post:
+      tags:
+        - Catalogo
+      summary: Crear categoria (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idCategoriaPadre:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                descripcion:
+                  nullable: true
+                  type: string
+                  maxLength: 500
+                orden:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 32767
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - nombre
+                - slug
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/categorias/{id}:
+    put:
+      tags:
+        - Catalogo
+      summary: Editar categoria (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idCategoriaPadre:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                descripcion:
+                  nullable: true
+                  type: string
+                  maxLength: 500
+                orden:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 32767
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - nombre
+                - slug
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    delete:
+      tags:
+        - Catalogo
+      summary: Eliminar o desactivar categoria (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/marcas:
+    get:
+      tags:
+        - Catalogo
+      summary: Listar marcas
+      security: *a1
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+    post:
+      tags:
+        - Catalogo
+      summary: Crear marca (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                logoUrl:
+                  nullable: true
+                  type: string
+                  maxLength: 500
+                  format: uri
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - nombre
+                - slug
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/marcas/{id}:
+    put:
+      tags:
+        - Catalogo
+      summary: Editar marca (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                logoUrl:
+                  nullable: true
+                  type: string
+                  maxLength: 500
+                  format: uri
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - nombre
+                - slug
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/atributos:
+    get:
+      tags:
+        - Catalogo
+      summary: Listar atributos y valores
+      security: *a1
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/catalogo/productos:
+    get:
+      tags:
+        - Catalogo
+      summary: Buscar productos con filtros
+      security: *a1
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: texto
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: idCategoria
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: idMarca
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: precioMinimo
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 0
+        - name: precioMaximo
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 0
+        - name: soloDisponibles
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+        - name: soloEnOferta
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+        - name: orden
+          in: query
+          required: false
+          schema:
+            default: RECIENTES
+            type: string
+            enum:
+              - RECIENTES
+              - PRECIO_ASC
+              - PRECIO_DESC
+              - NOMBRE
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+    post:
+      tags:
+        - Catalogo
+      summary: Crear producto (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idCategoria:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idMarca:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                descripcion:
+                  nullable: true
+                  type: string
+                  maxLength: 10000
+                mesesGarantia:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 120
+                codigoImpuesto:
+                  default: IVA
+                  type: string
+                  enum:
+                    - IVA
+                    - EXENTO
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - idCategoria
+                - nombre
+                - slug
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/admin/productos:
+    get:
+      tags:
+        - Catalogo
+      summary: Listar productos, incluidos inactivos (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: texto
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: idCategoria
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: activo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/productos/{referencia}:
+    get:
+      tags:
+        - Catalogo
+      summary: Detalle por id o slug
+      security: *a1
+      parameters:
+        - name: referencia
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 220
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/catalogo/productos/{id}:
+    put:
+      tags:
+        - Catalogo
+      summary: Editar producto (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idCategoria:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idMarca:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                descripcion:
+                  nullable: true
+                  type: string
+                  maxLength: 10000
+                mesesGarantia:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 120
+                codigoImpuesto:
+                  default: IVA
+                  type: string
+                  enum:
+                    - IVA
+                    - EXENTO
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - idCategoria
+                - nombre
+                - slug
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    delete:
+      tags:
+        - Catalogo
+      summary: Dar de baja producto (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/productos/{id}/variantes:
+    post:
+      tags:
+        - Catalogo
+      summary: Crear variante (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sku:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+                  pattern: ^[A-Za-z0-9-]+$
+                precio:
+                  type: number
+                  minimum: 0
+                  multipleOf: 0.01
+                pesoGramos:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                activo:
+                  default: true
+                  type: boolean
+                valoresAtributo:
+                  maxItems: 20
+                  type: array
+                  items:
+                    type: integer
+                    minimum: 0
+                    exclusiveMinimum: true
+                    maximum: 9007199254740991
+              required:
+                - sku
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/productos/{id}/variantes/{idVariante}:
+    put:
+      tags:
+        - Catalogo
+      summary: Editar variante (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: idVariante
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sku:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+                  pattern: ^[A-Za-z0-9-]+$
+                pesoGramos:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                activo:
+                  default: true
+                  type: boolean
+                valoresAtributo:
+                  maxItems: 20
+                  type: array
+                  items:
+                    type: integer
+                    minimum: 0
+                    exclusiveMinimum: true
+                    maximum: 9007199254740991
+              required:
+                - sku
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/productos/{id}/imagenes:
+    post:
+      tags:
+        - Catalogo
+      summary: Agregar imagen (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idVariante:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                url:
+                  type: string
+                  maxLength: 500
+                  format: uri
+                textoAlt:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                orden:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 9007199254740991
+              required:
+                - url
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/imagenes/{id}:
+    delete:
+      tags:
+        - Catalogo
+      summary: Eliminar imagen (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/variantes/{id}/precio:
+    put:
+      tags:
+        - Catalogo
+      summary: Cambiar precio (PRECIOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                precio:
+                  type: number
+                  minimum: 0
+                  multipleOf: 0.01
+              required:
+                - precio
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/catalogo/variantes/{id}/precios:
+    get:
+      tags:
+        - Catalogo
+      summary: Historial de precios (PRECIOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/existencias:
+    get:
+      tags:
+        - Inventario
+      summary: Existencia por variante y bodega (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: texto
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: idBodega
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: soloBajoMinimo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/kardex:
+    get:
+      tags:
+        - Inventario
+      summary: Consultar kardex (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: idVariante
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: idBodega
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+        - name: hasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/conciliacion:
+    get:
+      tags:
+        - Inventario
+      summary: Comparar existencia contra kardex (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/entradas:
+    post:
+      tags:
+        - Inventario
+      summary: Registrar entrada por compra (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idVariante:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idBodega:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                cantidad:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                costoUnitario:
+                  type: number
+                  minimum: 0
+                  multipleOf: 0.0001
+                motivo:
+                  type: string
+                  maxLength: 300
+                referenciaDocumento:
+                  type: string
+                  maxLength: 60
+              required:
+                - idVariante
+                - idBodega
+                - cantidad
+                - costoUnitario
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/ajustes:
+    post:
+      tags:
+        - Inventario
+      summary: Ajuste manual con motivo (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idVariante:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idBodega:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                cantidad:
+                  type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+                motivo:
+                  type: string
+                  minLength: 1
+                  maxLength: 300
+              required:
+                - idVariante
+                - idBodega
+                - cantidad
+                - motivo
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/traslados:
+    post:
+      tags:
+        - Inventario
+      summary: Trasladar entre bodegas (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idVariante:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idBodegaOrigen:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idBodegaDestino:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                cantidad:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                motivo:
+                  type: string
+                  minLength: 1
+                  maxLength: 300
+              required:
+                - idVariante
+                - idBodegaOrigen
+                - idBodegaDestino
+                - cantidad
+                - motivo
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/bodegas:
+    get:
+      tags:
+        - Inventario
+      summary: Listar bodegas (INVENTARIO_GESTIONAR)
+      security: *a2
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Inventario
+      summary: Crear bodega (CONFIG_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idSucursal:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                codigo:
+                  type: string
+                  minLength: 1
+                  maxLength: 20
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                permiteVentaEnLinea:
+                  default: true
+                  type: boolean
+                prioridad:
+                  default: 100
+                  type: integer
+                  minimum: 0
+                  maximum: 32767
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigo
+                - nombre
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/bodegas/{id}:
+    put:
+      tags:
+        - Inventario
+      summary: Editar bodega (CONFIG_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idSucursal:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                codigo:
+                  type: string
+                  minLength: 1
+                  maxLength: 20
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                permiteVentaEnLinea:
+                  default: true
+                  type: boolean
+                prioridad:
+                  default: 100
+                  type: integer
+                  minimum: 0
+                  maximum: 32767
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigo
+                - nombre
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/sucursales:
+    get:
+      tags:
+        - Inventario
+      summary: Sucursales, con disponibilidad opcional
+      security: *a1
+      parameters:
+        - name: soloRecoger
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+        - name: idVariante
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+    post:
+      tags:
+        - Inventario
+      summary: Crear sucursal (CONFIG_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigo:
+                  type: string
+                  minLength: 1
+                  maxLength: 20
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                idMunicipio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                direccion:
+                  type: string
+                  minLength: 1
+                  maxLength: 250
+                telefono:
+                  nullable: true
+                  type: string
+                  maxLength: 20
+                horario:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                permiteRecoger:
+                  default: true
+                  type: boolean
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigo
+                - nombre
+                - idMunicipio
+                - direccion
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/inventario/sucursales/{id}:
+    put:
+      tags:
+        - Inventario
+      summary: Editar sucursal (CONFIG_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigo:
+                  type: string
+                  minLength: 1
+                  maxLength: 20
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                idMunicipio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                direccion:
+                  type: string
+                  minLength: 1
+                  maxLength: 250
+                telefono:
+                  nullable: true
+                  type: string
+                  maxLength: 20
+                horario:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                permiteRecoger:
+                  default: true
+                  type: boolean
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigo
+                - nombre
+                - idMunicipio
+                - direccion
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/carrito:
+    get:
+      tags:
+        - Carrito
+      summary: Ver carrito con subtotal, descuento y total
+      security: &a3
+        - bearer: []
+        - {}
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/carrito/items:
+    post:
+      tags:
+        - Carrito
+      summary: Agregar producto
+      security: *a3
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idVariante:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                cantidad:
+                  default: 1
+                  type: integer
+                  minimum: 1
+                  maximum: 999
+              required:
+                - idVariante
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/carrito/items/{idVariante}:
+    patch:
+      tags:
+        - Carrito
+      summary: Modificar cantidad
+      security: *a3
+      parameters:
+        - name: idVariante
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cantidad:
+                  type: integer
+                  minimum: 1
+                  maximum: 999
+              required:
+                - cantidad
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+    delete:
+      tags:
+        - Carrito
+      summary: Eliminar producto
+      security: *a3
+      parameters:
+        - name: idVariante
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/carrito/cupon:
+    post:
+      tags:
+        - Carrito
+      summary: Aplicar cupon
+      security: *a3
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigo:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+              required:
+                - codigo
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+    delete:
+      tags:
+        - Carrito
+      summary: Quitar cupon
+      security: *a3
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/cupones:
+    get:
+      tags:
+        - Cupones
+      summary: Listar cupones (CUPONES_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: texto
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 40
+        - name: activo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Cupones
+      summary: Crear cupon (CUPONES_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigo:
+                  type: string
+                  pattern: ^[A-Z0-9_-]{3,40}$
+                descripcion:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                tipoDescuento:
+                  type: string
+                  enum:
+                    - PORCENTAJE
+                    - MONTO
+                valor:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                descuentoMaximo:
+                  nullable: true
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                montoMinimo:
+                  default: 0
+                  type: number
+                  minimum: 0
+                  multipleOf: 0.01
+                vigenteDesde:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                vigenteHasta:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                limiteTotal:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                limitePorCliente:
+                  default: 1
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idCategoria:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigo
+                - tipoDescuento
+                - valor
+                - vigenteDesde
+                - vigenteHasta
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/cupones/{id}:
+    put:
+      tags:
+        - Cupones
+      summary: Editar cupon (CUPONES_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigo:
+                  type: string
+                  pattern: ^[A-Z0-9_-]{3,40}$
+                descripcion:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                tipoDescuento:
+                  type: string
+                  enum:
+                    - PORCENTAJE
+                    - MONTO
+                valor:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                descuentoMaximo:
+                  nullable: true
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                montoMinimo:
+                  default: 0
+                  type: number
+                  minimum: 0
+                  multipleOf: 0.01
+                vigenteDesde:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                vigenteHasta:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                limiteTotal:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                limitePorCliente:
+                  default: 1
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idCategoria:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigo
+                - tipoDescuento
+                - valor
+                - vigenteDesde
+                - vigenteHasta
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    delete:
+      tags:
+        - Cupones
+      summary: Desactivar cupon (CUPONES_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/checkout/envios:
+    get:
+      tags:
+        - Checkout
+      summary: Opciones de envio para una direccion propia
+      security: *a2
+      parameters:
+        - name: idDireccion
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/checkout:
+    post:
+      tags:
+        - Checkout
+      summary: "Iniciar pago: congela precios y reserva 15 minutos"
+      security: *a2
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idMetodoEnvio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idDireccion:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idSucursalRecoger:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+              required:
+                - idMetodoEnvio
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/checkout/{id}/pagar:
+    post:
+      tags:
+        - Checkout
+      summary: Cobrar y crear el pedido
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idMetodoPago:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                tokenPago:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                nitFactura:
+                  default: CF
+                  type: string
+                  pattern: ^(CF|\d{1,14}[0-9Kk]?)$
+                nombreFactura:
+                  type: string
+                  maxLength: 200
+              required:
+                - idMetodoPago
+                - tokenPago
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/checkout/{id}:
+    delete:
+      tags:
+        - Checkout
+      summary: Cancelar checkout y liberar la reserva
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/mios:
+    get:
+      tags:
+        - Pedidos
+      summary: Mis pedidos
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos:
+    get:
+      tags:
+        - Pedidos
+      summary: Listar pedidos con filtros (PEDIDOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - PAGADO
+              - EN_PREPARACION
+              - LISTO_RECOGER
+              - DESPACHADO
+              - ENTREGADO
+              - CANCELADO
+              - DEVUELTO_PARCIAL
+              - DEVUELTO_TOTAL
+        - name: idUsuario
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: textoCliente
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: hasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: orden
+          in: query
+          required: false
+          schema:
+            default: FECHA_DESC
+            type: string
+            enum:
+              - FECHA_DESC
+              - FECHA_ASC
+              - TOTAL_DESC
+              - TOTAL_ASC
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/reembolsos:
+    get:
+      tags:
+        - Pedidos
+      summary: Listar reembolsos (PEDIDOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - PENDIENTE
+              - PROCESADO
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/reembolsos/{id}/procesar:
+    post:
+      tags:
+        - Pedidos
+      summary: Marcar reembolso como procesado (PEDIDOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                referencia:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+              required:
+                - referencia
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/{id}:
+    get:
+      tags:
+        - Pedidos
+      summary: Detalle e historial; solo el dueno o personal
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/{id}/estado:
+    patch:
+      tags:
+        - Pedidos
+      summary: Avanzar estado (PEDIDOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  enum:
+                    - EN_PREPARACION
+                    - LISTO_RECOGER
+                    - DESPACHADO
+                    - ENTREGADO
+                motivo:
+                  type: string
+                  maxLength: 300
+              required:
+                - estado
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/{id}/cancelar:
+    post:
+      tags:
+        - Pedidos
+      summary: Cancelar antes del despacho
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motivo:
+                  type: string
+                  minLength: 1
+                  maxLength: 300
+              required:
+                - motivo
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/pedidos/{id}/devoluciones:
+    post:
+      tags:
+        - Pedidos
+      summary: Registrar devolucion total o parcial (PEDIDOS_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motivo:
+                  type: string
+                  minLength: 1
+                  maxLength: 300
+                lineas:
+                  minItems: 1
+                  maxItems: 100
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      idPedidoDetalle:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      cantidad:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      reingresaInventario:
+                        default: true
+                        type: boolean
+                      idBodega:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                    required:
+                      - idPedidoDetalle
+                      - cantidad
+              required:
+                - motivo
+                - lineas
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/dashboard/resumen:
+    get:
+      tags:
+        - Reportes
+      summary: "KPI: ventas, pedidos, ticket promedio (REPORTES_VER)"
+      security: *a2
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/dashboard/ventas:
+    get:
+      tags:
+        - Reportes
+      summary: Ventas por dia, semana o mes (REPORTES_VER)
+      security: *a2
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: agrupacion
+          in: query
+          required: false
+          schema:
+            default: DIA
+            type: string
+            enum:
+              - DIA
+              - SEMANA
+              - MES
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/dashboard/categorias:
+    get:
+      tags:
+        - Reportes
+      summary: Ventas por categoria (REPORTES_VER)
+      security: *a2
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/dashboard/top-productos:
+    get:
+      tags:
+        - Reportes
+      summary: Productos mas vendidos (REPORTES_VER)
+      security: *a2
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: limite
+          in: query
+          required: false
+          schema:
+            default: 10
+            type: integer
+            minimum: 1
+            maximum: 50
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/dashboard/carritos-abandonados:
+    get:
+      tags:
+        - Reportes
+      summary: Carritos abandonados (REPORTES_VER)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/dashboard/margen:
+    get:
+      tags:
+        - Reportes
+      summary: Margen bruto por producto (REPORTES_VER)
+      security: *a2
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/reportes/bitacora:
+    get:
+      tags:
+        - Reportes
+      summary: Consultar bitacora por modulo (BITACORA_VER)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: modulo
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 30
+        - name: entidad
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 60
+        - name: idEntidad
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 60
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+        - name: hasta
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/marketing/promociones:
+    get:
+      tags:
+        - Marketing
+      summary: Listar promociones (MARKETING_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Marketing
+      summary: Crear promocion (MARKETING_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                tipoDescuento:
+                  type: string
+                  enum:
+                    - PORCENTAJE
+                    - MONTO
+                valor:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                vigenteDesde:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                vigenteHasta:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                activo:
+                  default: true
+                  type: boolean
+                alcance:
+                  minItems: 1
+                  maxItems: 100
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      idCategoria:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      idMarca:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      idProducto:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      idVariante:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+              required:
+                - nombre
+                - slug
+                - tipoDescuento
+                - valor
+                - vigenteDesde
+                - vigenteHasta
+                - alcance
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/marketing/promociones/{id}:
+    put:
+      tags:
+        - Marketing
+      summary: Editar promocion (MARKETING_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                slug:
+                  type: string
+                  maxLength: 120
+                  pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                tipoDescuento:
+                  type: string
+                  enum:
+                    - PORCENTAJE
+                    - MONTO
+                valor:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                vigenteDesde:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                vigenteHasta:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                activo:
+                  default: true
+                  type: boolean
+                alcance:
+                  minItems: 1
+                  maxItems: 100
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      idCategoria:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      idMarca:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      idProducto:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                      idVariante:
+                        type: integer
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+              required:
+                - nombre
+                - slug
+                - tipoDescuento
+                - valor
+                - vigenteDesde
+                - vigenteHasta
+                - alcance
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/marketing/anuncios:
+    get:
+      tags:
+        - Marketing
+      summary: Listar anuncios con metricas (MARKETING_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+        - name: tamanoPagina
+          in: query
+          required: false
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+    post:
+      tags:
+        - Marketing
+      summary: Crear anuncio (MARKETING_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigoZona:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+                idPromocion:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                titulo:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                subtitulo:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                imagenEscritorioUrl:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                imagenMovilUrl:
+                  nullable: true
+                  type: string
+                  maxLength: 500
+                urlDestino:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                orden:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 9007199254740991
+                vigenteDesde:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                vigenteHasta:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigoZona
+                - titulo
+                - imagenEscritorioUrl
+                - urlDestino
+                - vigenteDesde
+                - vigenteHasta
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/marketing/anuncios/{id}:
+    put:
+      tags:
+        - Marketing
+      summary: Editar anuncio (MARKETING_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigoZona:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+                idPromocion:
+                  nullable: true
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                titulo:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                subtitulo:
+                  nullable: true
+                  type: string
+                  maxLength: 200
+                imagenEscritorioUrl:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                imagenMovilUrl:
+                  nullable: true
+                  type: string
+                  maxLength: 500
+                urlDestino:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                orden:
+                  default: 0
+                  type: integer
+                  minimum: 0
+                  maximum: 9007199254740991
+                vigenteDesde:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                vigenteHasta:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - codigoZona
+                - titulo
+                - imagenEscritorioUrl
+                - urlDestino
+                - vigenteDesde
+                - vigenteHasta
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/marketing/anuncios/vigentes:
+    get:
+      tags:
+        - Marketing
+      summary: Anuncios visibles en una zona
+      security: *a1
+      parameters:
+        - name: zona
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 40
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/marketing/anuncios/{id}/eventos:
+    post:
+      tags:
+        - Marketing
+      summary: Registrar impresion o clic
+      security: *a1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                evento:
+                  type: string
+                  enum:
+                    - IMPRESION
+                    - CLIC
+              required:
+                - evento
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+  /api/v1/configuracion/parametros:
+    get:
+      tags:
+        - Configuracion
+      summary: Listar parametros (CONFIG_GESTIONAR)
+      security: *a2
+      parameters: []
+      responses:
+        "200":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/configuracion/parametros/{clave}:
+    put:
+      tags:
+        - Configuracion
+      summary: Cambiar parametro (CONFIG_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: clave
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[A-Z0-9_]{1,60}$
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valor:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+              required:
+                - valor
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
+  /api/v1/configuracion/tarifas-envio:
+    put:
+      tags:
+        - Configuracion
+      summary: Crear o cambiar tarifa de envio (CONFIG_GESTIONAR)
+      security: *a2
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idMetodoEnvio:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                idDepartamento:
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                costo:
+                  type: number
+                  minimum: 0
+                  multipleOf: 0.01
+                montoEnvioGratis:
+                  nullable: true
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  multipleOf: 0.01
+                diasEstimados:
+                  type: integer
+                  minimum: 0
+                  maximum: 60
+                activo:
+                  default: true
+                  type: boolean
+              required:
+                - idMetodoEnvio
+                - idDepartamento
+                - costo
+                - diasEstimados
+      responses:
+        "204":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso

@@ -29,6 +29,14 @@ Completa `.env`: las contraseñas de `shopcart_api` y `shopcart_jobs`, y `JWT_SE
 - Pruebas de punta a punta, con el API arrancado: `npm run test:e2e`
 - Verificación completa: `npm run typecheck && npm run lint && npm run build`
 
+## Probar la API con Bruno
+
+En `backend/docs/api` están `openapi.yml` y una colección nativa en `bruno/`. Se regeneran desde las rutas con `npm run docs:api`.
+
+1. En Bruno, usa **Open Collection** y elige `backend/docs/api/bruno`.
+2. Selecciona el entorno **Local**.
+3. Ejecuta una petición de inicio de sesión: el token se guarda solo.
+
 ## Credenciales de prueba
 
 Contraseña de todos: `ShopCart#2026`. Solo existen en los datos semilla.

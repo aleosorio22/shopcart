@@ -1,0 +1,27 @@
+meta {
+  name: Editar producto
+  type: http
+  seq: 13
+}
+
+put {
+  url: {{baseUrl}}/api/v1/catalogo/productos/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "idCategoria": 1,
+    "nombre": "Ejemplo",
+    "slug": "ejemplo-api"
+  }
+}
+
+docs {
+  Editar producto (CATALOGO_GESTIONAR)
+}
