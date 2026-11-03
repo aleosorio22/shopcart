@@ -2,7 +2,7 @@
 
 Motor: SQL Server 2019 o superior. No se usa ninguna función exclusiva de 2022.
 
-**Estado:** los scripts están aplicados en SQL Server y `015_Pruebas.sql` pasa completo.
+**Estado:** los scripts están aplicados en SQL Server. `015_Pruebas.sql` se ajustó para comprobar los triggers de inmutabilidad y debe correrse de nuevo.
 
 ## 1. Lo que pide el enunciado
 

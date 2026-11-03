@@ -1,4 +1,5 @@
 /* 015 - Pruebas de aceptacion de RF-01 a RF-09 sobre la semilla. No forma parte de la instalacion.
+   Se puede repetir: cada corrida crea su propio pedido de prueba.
    Se ejecuta con ejecutar.sh --pruebas. Falla con codigo de salida distinto de cero. */
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
@@ -30,7 +31,7 @@ EXEC #Espera N'RF-03 ajuste no deja saldo negativo', @Sql, 51203;
 EXEC #Espera N'RF-09 bitacora no se modifica', N'UPDATE TOP (1) Auditoria.Bitacora SET Accion = ''CREAR'';', 51507;
 EXEC #Espera N'RF-09 bitacora no se elimina', N'DELETE TOP (1) Auditoria.Bitacora;', 51507;
 EXEC #Espera N'RF-09 bitacora no admite TRUNCATE', N'TRUNCATE TABLE Auditoria.Bitacora;', 4712;
-EXEC #Espera N'RF-03 kardex no se modifica', N'UPDATE TOP (1) Inventario.Kardex SET Cantidad = 1;', 51204;
+EXEC #Espera N'RF-03 kardex no se modifica', N'UPDATE TOP (1) Inventario.Kardex SET Motivo = N''Alterado'';', 51204;
 EXEC #Espera N'RF-02 precio historico no se modifica', N'UPDATE TOP (1) Catalogo.PrecioVariante SET Precio = 1;', 51506;
 EXEC #Espera N'RF-01 cliente no cambia precios', N'EXEC Api.SP_Catalogo_CambiarPrecio 4, 1, 10;', 51000;
 EXEC #Espera N'RF-01 operador no ve bitacora', N'EXEC Api.SP_Bitacora_Consultar 3;', 51000;
@@ -39,7 +40,7 @@ GO
 /* Compra completa con cupon, repeticiones e intentos de acceso ajeno. */
 DECLARE @Cli INT = 4, @Otro INT = 5, @Dir INT, @DirOtro INT, @Env SMALLINT = 1, @Pago SMALLINT = 1, @H BINARY(32) = HASHBYTES('SHA2_256', 'prueba'), @L1 UNIQUEIDENTIFIER = NEWID(), @L2 UNIQUEIDENTIFIER = NEWID(),
         @Var INT = (SELECT IDVariante FROM Catalogo.Variante WHERE SKU = 'MOU-M185-NEG'), @Var2 INT = (SELECT IDVariante FROM Catalogo.Variante WHERE SKU = 'PLY-BAS-M'), @Antes INT, @Sql NVARCHAR(MAX),
-        @IDCheckout BIGINT, @Total DECIMAL(18,2), @IDPedido BIGINT, @Pedidos INT, @Precio DECIMAL(18,2), @Det BIGINT;
+        @IDCheckout BIGINT, @Total DECIMAL(18,2), @IDPedido BIGINT, @Pedidos INT, @Precio DECIMAL(18,2), @Det BIGINT, @Ref1 VARCHAR(100) = CONCAT('P-', NEWID()), @Ref2 VARCHAR(100) = CONCAT('P-', NEWID()), @L3 UNIQUEIDENTIFIER = NEWID();
 DECLARE @C TABLE (a BIGINT, b DECIMAL(18,2), c DECIMAL(18,2), d DECIMAL(18,2), e DECIMAL(18,2), f VARCHAR(12), g DATETIME2(3));
 DECLARE @P TABLE (a BIGINT, b VARCHAR(20), c DECIMAL(18,2), d VARCHAR(30));
 
@@ -63,9 +64,9 @@ EXEC #Espera N'RF-06 monto cobrado distinto se rechaza', @Sql, 51408;
 
 SELECT @Precio = PrecioUnitario FROM Ventas.CheckoutDetalle WHERE IDCheckout = @IDCheckout AND IDVariante = @Var;
 EXEC Api.SP_Catalogo_CambiarPrecio 2, @Var, 1.00;
-INSERT @P EXEC Api.SP_Pedidos_CrearPedido @Cli, @IDCheckout, @L2, @H, @Pago, 'P-PRUEBA-1', @Total;
-INSERT @P EXEC Api.SP_Pedidos_CrearPedido @Cli, @IDCheckout, @L2, @H, @Pago, 'P-PRUEBA-1', @Total;
-INSERT @P EXEC Api.SP_Pedidos_CrearPedido @Cli, @IDCheckout, 'A0000000-0000-0000-0000-000000000001', @H, @Pago, 'P-PRUEBA-2', @Total;
+INSERT @P EXEC Api.SP_Pedidos_CrearPedido @Cli, @IDCheckout, @L2, @H, @Pago, @Ref1, @Total;
+INSERT @P EXEC Api.SP_Pedidos_CrearPedido @Cli, @IDCheckout, @L2, @H, @Pago, @Ref1, @Total;
+INSERT @P EXEC Api.SP_Pedidos_CrearPedido @Cli, @IDCheckout, @L3, @H, @Pago, @Ref2, @Total;
 SELECT @IDPedido = MIN(a) FROM @P;
 INSERT #R SELECT N'RF-06 pagar tres veces da un solo pedido', CASE WHEN COUNT(*) = 1 THEN 1 ELSE 0 END, CONCAT(COUNT(*), N'') FROM Ventas.Pedido WHERE IDCheckout = @IDCheckout;
 INSERT #R SELECT N'RF-06 un solo cobro', CASE WHEN COUNT(*) = 1 THEN 1 ELSE 0 END, CONCAT(COUNT(*), N'') FROM Ventas.Pago WHERE IDCheckout = @IDCheckout;
@@ -79,7 +80,7 @@ SET @Sql = CONCAT(N'EXEC Api.SP_Pedidos_CambiarEstado 3, ', @IDPedido, N', ''ENT
 EXEC #Espera N'RF-07 salto de estado rechazado', @Sql, 51501;
 SET @Sql = CONCAT(N'UPDATE Ventas.Pedido SET IDEstadoPedido = 5 WHERE IDPedido = ', @IDPedido, N';');
 EXEC #Espera N'RF-07 la BD rechaza la transicion directa', @Sql, 51501;
-SET @Sql = CONCAT(N'UPDATE Ventas.Pedido SET Total = 1 WHERE IDPedido = ', @IDPedido, N';');
+SET @Sql = CONCAT(N'UPDATE Ventas.Pedido SET Subtotal = Subtotal + 1, Total = Total + 1, BaseImponible = BaseImponible + 1 WHERE IDPedido = ', @IDPedido, N';');
 EXEC #Espera N'RF-02 el total del pedido es inmutable', @Sql, 51505;
 
 EXEC Api.SP_Pedidos_CambiarEstado 3, @IDPedido, 'EN_PREPARACION';
@@ -103,7 +104,7 @@ INSERT #R SELECT N'RF-07 historial registra cada cambio', CASE WHEN COUNT(*) >= 
 GO
 /* Reserva vencida: se libera sola al correr el job, y el cobro tardio queda para reembolso. */
 DECLARE @Cli INT = 6, @Dir INT = (SELECT IDDireccion FROM Clientes.Direccion WHERE IDUsuario = 6), @H BINARY(32) = 0x01, @L UNIQUEIDENTIFIER = NEWID(), @Var INT = (SELECT IDVariante FROM Catalogo.Variante WHERE SKU = 'PLY-BAS-L'),
-        @IDCheckout BIGINT, @Total DECIMAL(18,2), @R1 INT, @R2 INT, @Sql NVARCHAR(MAX);
+        @IDCheckout BIGINT, @Total DECIMAL(18,2), @R1 INT, @R2 INT, @Sql NVARCHAR(MAX), @RefTarde VARCHAR(100) = CONCAT('P-TARDE-', NEWID());
 DECLARE @C TABLE (a BIGINT, b DECIMAL(18,2), c DECIMAL(18,2), d DECIMAL(18,2), e DECIMAL(18,2), f VARCHAR(12), g DATETIME2(3));
 DECLARE @J TABLE (n INT);
 EXEC Interno.SP_Carrito_EscribirLinea @Cli, NULL, @Var, 1, 0;
@@ -111,9 +112,9 @@ SELECT @R1 = SUM(Reservada) FROM Inventario.Existencia WHERE IDVariante = @Var;
 INSERT @C EXEC Api.SP_Checkout_IniciarPago @Cli, @L, @H, 1, @Dir, NULL;
 SELECT @IDCheckout = a, @Total = e FROM @C;
 UPDATE Ventas.Checkout SET ExpiraEn = DATEADD(MINUTE, -1, SYSUTCDATETIME()) WHERE IDCheckout = @IDCheckout;
-SET @Sql = CONCAT(N'EXEC Api.SP_Pedidos_CrearPedido ', @Cli, N', ', @IDCheckout, N', ''', NEWID(), N''', 0x01, 1, ''P-TARDE'', ', @Total, N';');
+SET @Sql = CONCAT(N'EXEC Api.SP_Pedidos_CrearPedido ', @Cli, N', ', @IDCheckout, N', ''', NEWID(), N''', 0x01, 1, ''', @RefTarde, N''', ', @Total, N';');
 EXEC #Espera N'RF-06 pago tardio rechazado', @Sql, 51403;
-INSERT #R SELECT N'RF-06 pago tardio queda para reembolso', CASE WHEN COUNT(*) = 1 THEN 1 ELSE 0 END, NULL FROM Ventas.Pago WHERE ReferenciaPasarela = 'P-TARDE' AND Estado = 'REEMBOLSO_PENDIENTE';
+INSERT #R SELECT N'RF-06 pago tardio queda para reembolso', CASE WHEN COUNT(*) = 1 THEN 1 ELSE 0 END, NULL FROM Ventas.Pago WHERE ReferenciaPasarela = @RefTarde AND Estado = 'REEMBOLSO_PENDIENTE';
 INSERT @J EXEC Job.SP_Inventario_LiberarReservasVencidas;
 SELECT @R2 = SUM(Reservada) FROM Inventario.Existencia WHERE IDVariante = @Var;
 INSERT #R VALUES (N'RF-07 reserva vencida libera existencia', CASE WHEN @R1 = @R2 THEN 1 ELSE 0 END, CONCAT(@R1, N'/', @R2));
