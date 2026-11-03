@@ -2,7 +2,7 @@
 
 Motor: SQL Server 2019 o superior. No se usa ninguna función exclusiva de 2022.
 
-**Estado:** los scripts aún no se han ejecutado en un SQL Server. Hasta correr `./ejecutar.sh --pruebas`, ningún comportamiento descrito aquí está comprobado.
+**Estado:** los scripts están aplicados en SQL Server y `015_Pruebas.sql` pasa completo.
 
 ## 1. Lo que pide el enunciado
 

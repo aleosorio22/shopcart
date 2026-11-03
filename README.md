@@ -4,8 +4,8 @@ Plataforma de ventas: base de datos SQL Server, API en Node.js con TypeScript y 
 
 | Carpeta | Contenido | Estado |
 |---|---|---|
-| `database/` | Scripts numerados, documento de diseño y diagrama ER | Escrito; pendiente de ejecutar en SQL Server |
-| `backend/` | API REST, monolito modular | Compila y pasa sus pruebas sin base de datos |
+| `database/` | Scripts numerados, documento de diseño y diagrama ER | Aplicado y probado en SQL Server |
+| `backend/` | API REST, monolito modular | Probado de punta a punta contra SQL Server |
 | `frontend/` | Aplicación React | Fase 2 |
 
 ## Instalación
@@ -25,7 +25,8 @@ npm run dev
 Completa `.env`: las contraseñas de `shopcart_api` y `shopcart_jobs`, y `JWT_SECRET`, que puedes generar con `openssl rand -base64 48`. El API no arranca si falta un valor.
 
 - Documentación interactiva: `http://localhost:3000/api/docs`
-- Pruebas: `npm test`
+- Pruebas sin base de datos: `npm test`
+- Pruebas de punta a punta, con el API arrancado: `npm run test:e2e`
 - Verificación completa: `npm run typecheck && npm run lint && npm run build`
 
 ## Credenciales de prueba
