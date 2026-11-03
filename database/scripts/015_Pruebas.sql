@@ -23,7 +23,7 @@ GO
 DECLARE @Var INT = (SELECT IDVariante FROM Catalogo.Variante WHERE SKU = 'MOU-M185-NEG'),
         @Bod INT = (SELECT IDBodega FROM Inventario.Bodega WHERE Codigo = 'CD-01'), @Sql NVARCHAR(MAX);
 
-SET @Sql = CONCAT(N'EXEC Api.SP_Inventario_AjustarExistencia 3, ', @Var, N', ', @Bod, N', -1, N''''');');
+SET @Sql = CONCAT(N'EXEC Api.SP_Inventario_AjustarExistencia 3, ', @Var, N', ', @Bod, N', -1, N'''';');
 EXEC #Espera N'RF-03 ajuste sin motivo se rechaza', @Sql, 51202;
 SET @Sql = CONCAT(N'EXEC Api.SP_Inventario_AjustarExistencia 3, ', @Var, N', ', @Bod, N', -99999, N''Merma'';');
 EXEC #Espera N'RF-03 ajuste no deja saldo negativo', @Sql, 51203;
