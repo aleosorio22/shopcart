@@ -16,9 +16,9 @@ export function TiendaLayout() {
       </main>
       <footer className="bg-nube text-[12px] text-tinta-suave">
         <div className="contenedor space-y-3 py-8">
-          <p>Precios en quetzales con IVA incluido. Envio gratis en compras desde Q1,000 a domicilio, o recoge sin costo en tienda.</p>
+          <p>Precios en quetzales con IVA incluido. Envío gratis en compras desde Q1,000 a domicilio, o recoge sin costo en tienda.</p>
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-linea pt-3">
-            <span>© {ANIO} ShopCart. Proyecto de demostracion.</span>
+            <span>© {ANIO} ShopCart. Proyecto de demostración.</span>
             <nav className="flex gap-4">
               <Link to="/tienda" className="hover:underline">
                 Tienda

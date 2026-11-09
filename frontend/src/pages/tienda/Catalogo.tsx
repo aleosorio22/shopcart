@@ -63,7 +63,7 @@ export default function Catalogo() {
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[220px_1fr]">
         <aside aria-label="Filtros" className="space-y-5 text-[15px]">
-          <Selector etiqueta="Categoria" value={valores.categoria ?? ''} onChange={(evento) => actualizar({ categoria: evento.target.value })}>
+          <Selector etiqueta="Categoría" value={valores.categoria ?? ''} onChange={(evento) => actualizar({ categoria: evento.target.value })}>
             <option value="">Todas</option>
             {categorias
               .filter((categoria) => categoria.Activo)
@@ -89,7 +89,7 @@ export default function Catalogo() {
                 min={0}
                 inputMode="numeric"
                 placeholder="Min"
-                aria-label="Precio minimo"
+                aria-label="Precio mínimo"
                 value={rango.min}
                 onChange={(evento) => setRango((actual) => ({ ...actual, min: evento.target.value }))}
                 className="w-full rounded-xl border border-linea px-3 py-2 text-[15px] outline-none focus:border-accion"
@@ -100,7 +100,7 @@ export default function Catalogo() {
                 min={0}
                 inputMode="numeric"
                 placeholder="Max"
-                aria-label="Precio maximo"
+                aria-label="Precio máximo"
                 value={rango.max}
                 onChange={(evento) => setRango((actual) => ({ ...actual, max: evento.target.value }))}
                 className="w-full rounded-xl border border-linea px-3 py-2 text-[15px] outline-none focus:border-accion"
@@ -108,7 +108,7 @@ export default function Catalogo() {
             </div>
             {rangoInvalido && (
               <p role="alert" className="text-[13px] text-peligro">
-                El minimo no puede ser mayor que el maximo.
+                El mínimo no puede ser mayor que el máximo.
               </p>
             )}
           </fieldset>
@@ -141,7 +141,7 @@ export default function Catalogo() {
                 onChange={(evento) => actualizar({ orden: evento.target.value })}
                 className="rounded-full bg-nube px-3 py-1.5 text-tinta outline-none"
               >
-                <option value="RECIENTES">Mas recientes</option>
+                <option value="RECIENTES">Más recientes</option>
                 <option value="PRECIO_ASC">Precio: menor a mayor</option>
                 <option value="PRECIO_DESC">Precio: mayor a menor</option>
                 <option value="NOMBRE">Nombre</option>
@@ -151,7 +151,7 @@ export default function Catalogo() {
           <Consulta
             consulta={consulta}
             esVacio={(resultado) => resultado.filas.length === 0}
-            vacio={<EstadoVacio titulo="No encontramos productos" descripcion="Prueba con otra busqueda o quita algunos filtros." />}
+            vacio={<EstadoVacio titulo="No encontramos productos" descripcion="Prueba con otra búsqueda o quita algunos filtros." />}
             cargando={
               <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
                 {Array.from({ length: 6 }, (_, indice) => (

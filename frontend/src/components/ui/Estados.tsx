@@ -30,7 +30,7 @@ export function EstadoError({ error, reintentar }: { error: unknown; reintentar?
   return (
     <div role="alert" className="flex flex-col items-center justify-center gap-2 py-20 text-center">
       <HiOutlineExclamationCircle className="mb-2 text-4xl text-peligro" aria-hidden />
-      <p className="text-lg font-semibold">No pudimos cargar esta informacion</p>
+      <p className="text-lg font-semibold">No pudimos cargar esta información</p>
       <p className="max-w-sm text-[15px] text-tinta-suave">{mensajeDe(error)}</p>
       {reintentar && (
         <Boton variante="secundario" tamano="sm" className="mt-4" onClick={reintentar}>
@@ -55,6 +55,6 @@ export function Consulta<T>({ consulta, esVacio, vacio, cargando, children }: Pr
   if (consulta.isPending) return <>{cargando ?? <EstadoCargando />}</>;
   if (consulta.isError) return <EstadoError error={consulta.error} reintentar={() => void consulta.refetch()} />;
   const dato = consulta.data as T;
-  if (esVacio?.(dato)) return <>{vacio ?? <EstadoVacio titulo="No hay nada por aqui" />}</>;
+  if (esVacio?.(dato)) return <>{vacio ?? <EstadoVacio titulo="No hay nada por aquí" />}</>;
   return <>{children(dato)}</>;
 }

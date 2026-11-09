@@ -42,7 +42,7 @@ function MenuLateral({ alNavegar }: { alNavegar?: () => void }) {
           onClick={() => void cerrarSesion().then(() => navegar('/'))}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-tinta/75 hover:bg-white/60"
         >
-          <HiOutlineArrowLeftOnRectangle className="text-lg" aria-hidden /> Cerrar sesion
+          <HiOutlineArrowLeftOnRectangle className="text-lg" aria-hidden /> Cerrar sesión
         </button>
       </div>
     </div>

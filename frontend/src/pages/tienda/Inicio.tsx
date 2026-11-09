@@ -61,9 +61,9 @@ export default function Inicio() {
       <section className="bg-nube">
         <div className="contenedor flex flex-col items-center py-20 text-center sm:py-28">
           <p className="text-[17px] font-semibold text-alerta">{anuncio ? anuncio.Titulo : 'Nuevo en ShopCart'}</p>
-          <h1 className="mt-2 max-w-3xl text-[44px] font-semibold leading-[1.07] tracking-tight sm:text-[64px]">Tecnologia que se siente bien.</h1>
+          <h1 className="mt-2 max-w-3xl text-[44px] font-semibold leading-[1.07] tracking-tight sm:text-[64px]">Tecnología que se siente bien.</h1>
           <p className="mt-4 max-w-xl text-[19px] text-tinta-suave sm:text-[21px]">
-            {anuncio?.Subtitulo ?? 'Compra en linea y recibe en casa, o recoge en tu tienda favorita.'}
+            {anuncio?.Subtitulo ?? 'Compra en línea y recibe en casa, o recoge en tu tienda favorita.'}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <EnlaceBoton to="/tienda" tamano="lg">
@@ -90,7 +90,7 @@ export default function Inicio() {
         </nav>
       )}
 
-      <Rejilla titulo="Lo mas reciente." />
+      <Rejilla titulo="Lo más reciente." />
       <div className="bg-nube">
         <Rejilla titulo="Ofertas de la semana." soloEnOferta />
       </div>

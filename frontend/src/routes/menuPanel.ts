@@ -30,5 +30,5 @@ export const MENU_PANEL: OpcionMenu[] = [
   { ruta: '/panel/inventario', etiqueta: 'Inventario', icono: HiOutlineArchiveBox, permiso: 'INVENTARIO_GESTIONAR' },
   { ruta: '/panel/cupones', etiqueta: 'Cupones', icono: HiOutlineTicket, permiso: 'CUPONES_GESTIONAR' },
   { ruta: '/panel/usuarios', etiqueta: 'Usuarios', icono: HiOutlineUsers, permiso: 'USUARIOS_GESTIONAR' },
-  { ruta: '/panel/bitacora', etiqueta: 'Bitacora', icono: HiOutlineDocumentMagnifyingGlass, permiso: 'BITACORA_VER' },
+  { ruta: '/panel/bitacora', etiqueta: 'Bitácora', icono: HiOutlineDocumentMagnifyingGlass, permiso: 'BITACORA_VER' },
 ];

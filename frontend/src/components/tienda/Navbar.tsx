@@ -53,7 +53,7 @@ export function Navbar() {
               aria-label="Buscar productos"
               className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-tinta-tenue"
             />
-            <button type="button" onClick={() => setBuscando(false)} aria-label="Cerrar busqueda" className="text-lg text-tinta-suave">
+            <button type="button" onClick={() => setBuscando(false)} aria-label="Cerrar búsqueda" className="text-lg text-tinta-suave">
               <HiXMark />
             </button>
           </form>
@@ -75,7 +75,7 @@ export function Navbar() {
               <HiOutlineMagnifyingGlass />
             </button>
           )}
-          <Link to="/bolsa" aria-label={`Bolsa, ${unidades} articulos`} className="relative hover:text-tinta">
+          <Link to="/bolsa" aria-label={`Bolsa, ${unidades} artículos`} className="relative hover:text-tinta">
             <HiOutlineShoppingBag />
             {unidades > 0 && (
               <span className="absolute -bottom-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-tinta px-1 text-[10px] font-medium text-white">
@@ -96,19 +96,19 @@ export function Navbar() {
                 <div className="px-3 py-2 text-xs text-tinta-suave">
                   {perfil.usuario.Nombres} {perfil.usuario.Apellidos}
                 </div>
-                {esPersonal && <ItemMenu a="/panel">Panel de administracion</ItemMenu>}
+                {esPersonal && <ItemMenu a="/panel">Panel de administración</ItemMenu>}
                 <ItemMenu a="/cuenta/pedidos">Mis pedidos</ItemMenu>
                 <ItemMenu a="/cuenta/direcciones">Direcciones</ItemMenu>
                 <ItemMenu a="/cuenta/perfil">Perfil</ItemMenu>
                 <MenuItem>
                   <button onClick={() => void cerrarSesion().then(() => navegar('/'))} className="block w-full rounded-xl px-3 py-2 text-left data-focus:bg-nube">
-                    Cerrar sesion
+                    Cerrar sesión
                   </button>
                 </MenuItem>
               </MenuItems>
             </Menu>
           ) : (
-            <Link to="/ingresar" aria-label="Iniciar sesion" className="hover:text-tinta">
+            <Link to="/ingresar" aria-label="Iniciar sesión" className="hover:text-tinta">
               <HiOutlineUserCircle />
             </Link>
           )}

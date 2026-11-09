@@ -2,7 +2,7 @@ import type { EstadoAvanzable, EstadoPedido } from '../services/pedidos.service'
 
 export const ETIQUETA_ESTADO: Record<EstadoPedido, string> = {
   PAGADO: 'Pagado',
-  EN_PREPARACION: 'En preparacion',
+  EN_PREPARACION: 'En preparación',
   LISTO_RECOGER: 'Listo para recoger',
   DESPACHADO: 'Despachado',
   ENTREGADO: 'Entregado',

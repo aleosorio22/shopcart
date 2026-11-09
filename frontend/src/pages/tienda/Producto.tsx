@@ -105,16 +105,16 @@ function Ficha({ detalle }: { detalle: DetalleProducto }) {
             <Boton tamano="lg" className="flex-1" cargando={agregar.isPending} onClick={() => agregar.mutate({ idVariante: variante.IDVariante, cantidad })}>
               Agregar a la bolsa
             </Boton>
-            {variante.Disponible <= 5 && <p className="w-full text-[14px] text-alerta">Solo quedan {variante.Disponible} en linea.</p>}
+            {variante.Disponible <= 5 && <p className="w-full text-[14px] text-alerta">Solo quedan {variante.Disponible} en línea.</p>}
           </div>
         ) : (
-          <p className="rounded-2xl bg-nube p-4 text-tinta-suave">Este modelo esta agotado por ahora.</p>
+          <p className="rounded-2xl bg-nube p-4 text-tinta-suave">Este modelo está agotado por ahora.</p>
         )}
 
         <ul className="divide-y divide-linea/70 rounded-2xl border border-linea/70 text-[14px]">
           <li className="flex gap-3 p-4">
             <HiOutlineTruck className="mt-0.5 shrink-0 text-xl" aria-hidden />
-            <span>Envio a domicilio en 1 a 3 dias. Gratis desde Q1,000.</span>
+            <span>Envío a domicilio en 1 a 3 días. Gratis desde Q1,000.</span>
           </li>
           <li className="flex gap-3 p-4">
             <HiOutlineBuildingStorefront className="mt-0.5 shrink-0 text-xl" aria-hidden />
@@ -126,14 +126,14 @@ function Ficha({ detalle }: { detalle: DetalleProducto }) {
           {producto.MesesGarantia > 0 && (
             <li className="flex gap-3 p-4">
               <HiOutlineShieldCheck className="mt-0.5 shrink-0 text-xl" aria-hidden />
-              <span>{producto.MesesGarantia} meses de garantia.</span>
+              <span>{producto.MesesGarantia} meses de garantía.</span>
             </li>
           )}
         </ul>
 
         {producto.Descripcion && (
           <section>
-            <h2 className="mb-2 text-[21px] font-semibold">Descripcion</h2>
+            <h2 className="mb-2 text-[21px] font-semibold">Descripción</h2>
             <p className="leading-relaxed text-tinta-suave">{producto.Descripcion}</p>
           </section>
         )}
@@ -162,7 +162,7 @@ export default function Producto() {
     <Consulta
       consulta={consulta}
       esVacio={(detalle) => !detalle.producto || detalle.variantes.length === 0}
-      vacio={<EstadoVacio titulo="Este producto no esta disponible" accion={<Link className="enlace" to="/tienda">Volver a la tienda</Link>} />}
+      vacio={<EstadoVacio titulo="Este producto no está disponible" accion={<Link className="enlace" to="/tienda">Volver a la tienda</Link>} />}
     >
       {(detalle) => <Ficha key={detalle.producto?.IDProducto} detalle={detalle} />}
     </Consulta>

@@ -14,20 +14,20 @@ const esquema = z
   .object({
     nombres: z.string().trim().min(1, 'Escribe tu nombre').max(100),
     apellidos: z.string().trim().min(1, 'Escribe tu apellido').max(100),
-    correo: z.string().trim().min(1, 'Escribe tu correo').email('Correo invalido').max(254),
+    correo: z.string().trim().min(1, 'Escribe tu correo').email('Correo inválido').max(254),
     telefono: z
       .string()
       .trim()
-      .regex(/^(\+?\d{8,15})?$/, 'Usa de 8 a 15 digitos')
+      .regex(/^(\+?\d{8,15})?$/, 'Usa de 8 a 15 dígitos')
       .transform((valor) => valor || undefined),
     contrasena: z
       .string()
-      .min(10, 'Minimo 10 caracteres')
-      .max(72, 'Maximo 72 caracteres')
-      .refine((valor) => /[a-zA-Z]/.test(valor) && /\d/.test(valor), 'Debe incluir letras y numeros'),
+      .min(10, 'Mínimo 10 caracteres')
+      .max(72, 'Máximo 72 caracteres')
+      .refine((valor) => /[a-zA-Z]/.test(valor) && /\d/.test(valor), 'Debe incluir letras y números'),
     confirmacion: z.string(),
   })
-  .refine((datos) => datos.contrasena === datos.confirmacion, { path: ['confirmacion'], message: 'Las contrasenas no coinciden' });
+  .refine((datos) => datos.contrasena === datos.confirmacion, { path: ['confirmacion'], message: 'Las contraseñas no coinciden' });
 type Entrada = z.input<typeof esquema>;
 type Datos = z.output<typeof esquema>;
 
@@ -62,13 +62,13 @@ export default function Registro() {
             <Campo etiqueta="Correo" type="email" autoComplete="email" {...register('correo')} error={errores.correo?.message} />
           </div>
           <div className="sm:col-span-2">
-            <Campo etiqueta="Telefono (opcional)" type="tel" autoComplete="tel" {...register('telefono')} error={errores.telefono?.message} />
+            <Campo etiqueta="Teléfono (opcional)" type="tel" autoComplete="tel" {...register('telefono')} error={errores.telefono?.message} />
           </div>
           <Campo
-            etiqueta="Contrasena"
+            etiqueta="Contraseña"
             type="password"
             autoComplete="new-password"
-            ayuda="10 caracteres con letras y numeros"
+            ayuda="10 caracteres con letras y números"
             {...register('contrasena')}
             error={errores.contrasena?.message}
           />
@@ -80,7 +80,7 @@ export default function Registro() {
         <p className="mt-6 text-center text-[15px] text-tinta-suave">
           ¿Ya tienes cuenta?{' '}
           <Link to="/ingresar" className="enlace">
-            Inicia sesion ›
+            Inicia sesión ›
           </Link>
         </p>
       </div>

@@ -10,8 +10,8 @@ import { mostrarErrorApi } from '../../utils/formularios';
 import { rutaSegura } from '../../utils/navegacion';
 
 const esquema = z.object({
-  correo: z.string().trim().min(1, 'Escribe tu correo').email('Correo invalido'),
-  contrasena: z.string().min(1, 'Escribe tu contrasena'),
+  correo: z.string().trim().min(1, 'Escribe tu correo').email('Correo inválido'),
+  contrasena: z.string().min(1, 'Escribe tu contraseña'),
 });
 type Datos = z.infer<typeof esquema>;
 
@@ -36,10 +36,10 @@ export default function Ingresar() {
   return (
     <div className="contenedor flex justify-center py-16">
       <div className="w-full max-w-sm">
-        <h1 className="text-center text-[32px] font-semibold">Inicia sesion en ShopCart.</h1>
+        <h1 className="text-center text-[32px] font-semibold">Inicia sesión en ShopCart.</h1>
         <form noValidate onSubmit={enviar} className="mt-8 space-y-4">
           <Campo etiqueta="Correo" type="email" autoComplete="email" {...register('correo')} error={formState.errors.correo?.message} />
-          <Campo etiqueta="Contrasena" type="password" autoComplete="current-password" {...register('contrasena')} error={formState.errors.contrasena?.message} />
+          <Campo etiqueta="Contraseña" type="password" autoComplete="current-password" {...register('contrasena')} error={formState.errors.contrasena?.message} />
           <Boton type="submit" tamano="lg" className="w-full" cargando={formState.isSubmitting}>
             Continuar
           </Boton>

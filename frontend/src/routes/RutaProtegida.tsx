@@ -19,7 +19,7 @@ export function RutaProtegida({ children, permiso, soloPersonal = false }: Props
   const { estado, tienePermiso, esPersonal } = useAuth();
   const ubicacion = useLocation();
 
-  if (estado === 'verificando') return <EstadoCargando texto="Verificando sesion" />;
+  if (estado === 'verificando') return <EstadoCargando texto="Verificando sesión" />;
   if (estado === 'anonimo') {
     const volver = encodeURIComponent(ubicacion.pathname + ubicacion.search);
     return <Navigate to={`/ingresar?volver=${volver}`} replace />;
@@ -32,7 +32,7 @@ export function SinAcceso() {
   return (
     <EstadoVacio
       icono={<HiOutlineLockClosed />}
-      titulo="No tienes acceso a esta seccion"
+      titulo="No tienes acceso a esta sección"
       descripcion="Tu rol no incluye este permiso. Si crees que es un error, contacta a un administrador."
       accion={<EnlaceBoton to="/">Ir a la tienda</EnlaceBoton>}
     />

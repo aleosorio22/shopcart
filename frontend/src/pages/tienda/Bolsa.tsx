@@ -12,7 +12,7 @@ import { useAccionesCarrito, useCarrito } from '../../hooks/useCarrito';
 import type { Carrito, LineaCarrito } from '../../services/carrito.service';
 import { quetzales } from '../../utils/formato';
 
-const esquemaCupon = z.object({ codigo: z.string().trim().min(3, 'Escribe el codigo del cupon').max(40) });
+const esquemaCupon = z.object({ codigo: z.string().trim().min(3, 'Escribe el código del cupón').max(40) });
 
 function Linea({ linea }: { linea: LineaCarrito }) {
   const { cambiarCantidad, quitar } = useAccionesCarrito();
@@ -30,7 +30,7 @@ function Linea({ linea }: { linea: LineaCarrito }) {
             {linea.NombreProducto}
           </Link>
           <p className="text-[13px] text-tinta-tenue">SKU {linea.SKU}</p>
-          {!linea.Vendible && <p className="mt-1 text-[14px] text-peligro">Ya no hay existencia suficiente. Reduce la cantidad o quitalo.</p>}
+          {!linea.Vendible && <p className="mt-1 text-[14px] text-peligro">Ya no hay existencia suficiente. Reduce la cantidad o quítalo.</p>}
         </div>
         <div className="flex items-center gap-4 sm:flex-col sm:items-end">
           <select
@@ -65,7 +65,7 @@ function Cupon({ codigo }: { codigo: string | null }) {
     return (
       <div className="flex items-center justify-between rounded-2xl bg-exito/5 px-4 py-3 text-[15px]">
         <span>
-          Cupon <strong className="font-semibold">{codigo}</strong> aplicado
+          Cupón <strong className="font-semibold">{codigo}</strong> aplicado
         </span>
         <button className="enlace text-[14px]" onClick={() => quitarCupon.mutate()} disabled={quitarCupon.isPending}>
           Quitar
@@ -88,8 +88,8 @@ function Cupon({ codigo }: { codigo: string | null }) {
       <div className="flex gap-2">
         <input
           {...register('codigo')}
-          placeholder="Codigo de cupon"
-          aria-label="Codigo de cupon"
+          placeholder="Código de cupón"
+          aria-label="Código de cupón"
           aria-invalid={Boolean(formState.errors.codigo)}
           className="flex-1 rounded-full border border-linea px-4 py-2 text-[15px] uppercase outline-none focus:border-accion"
         />
@@ -125,7 +125,7 @@ function Resumen({ carrito }: { carrito: Carrito }) {
           </div>
         )}
         <div className="flex justify-between">
-          <dt className="text-tinta-suave">Envio</dt>
+          <dt className="text-tinta-suave">Envío</dt>
           <dd className="text-tinta-suave">Se calcula al pagar</dd>
         </div>
         <div className="flex justify-between border-t border-linea pt-3 text-[21px] font-semibold">
@@ -135,9 +135,9 @@ function Resumen({ carrito }: { carrito: Carrito }) {
         <p className="text-[12px] text-tinta-tenue">IVA del 12 % incluido.</p>
       </dl>
       <Boton tamano="lg" className="w-full" disabled={bloqueado} onClick={() => navegar(estado === 'autenticado' ? '/checkout' : '/ingresar?volver=%2Fcheckout')}>
-        {estado === 'autenticado' ? 'Pagar' : 'Inicia sesion para pagar'}
+        {estado === 'autenticado' ? 'Pagar' : 'Inicia sesión para pagar'}
       </Boton>
-      {bloqueado && <p className="text-[13px] text-peligro">Corrige los articulos sin existencia para continuar.</p>}
+      {bloqueado && <p className="text-[13px] text-peligro">Corrige los artículos sin existencia para continuar.</p>}
     </aside>
   );
 }
@@ -152,8 +152,8 @@ export default function Bolsa() {
         vacio={
           <EstadoVacio
             icono={<HiOutlineShoppingBag />}
-            titulo="Tu bolsa esta vacia."
-            descripcion="Agrega productos y apareceran aqui."
+            titulo="Tu bolsa está vacía."
+            descripcion="Agrega productos y aparecerán aquí."
             accion={<EnlaceBoton to="/tienda">Seguir comprando</EnlaceBoton>}
           />
         }

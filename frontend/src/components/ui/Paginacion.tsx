@@ -13,13 +13,13 @@ export function Paginacion({ meta, alCambiar }: { meta: MetaPagina; alCambiar: (
         {desde}–{hasta} de {meta.total}
       </span>
       <div className="flex items-center gap-1">
-        <button className={boton} disabled={meta.pagina <= 1} onClick={() => alCambiar(meta.pagina - 1)} aria-label="Pagina anterior">
+        <button className={boton} disabled={meta.pagina <= 1} onClick={() => alCambiar(meta.pagina - 1)} aria-label="Página anterior">
           <HiChevronLeft />
         </button>
         <span className="min-w-16 text-center">
           {meta.pagina} / {paginas}
         </span>
-        <button className={boton} disabled={meta.pagina >= paginas} onClick={() => alCambiar(meta.pagina + 1)} aria-label="Pagina siguiente">
+        <button className={boton} disabled={meta.pagina >= paginas} onClick={() => alCambiar(meta.pagina + 1)} aria-label="Página siguiente">
           <HiChevronRight />
         </button>
       </div>
