@@ -1,0 +1,25 @@
+meta {
+  name: Agregar un valor a un atributo (un color o talla nueva)
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/atributos/:id/valores
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "valor": 10
+  }
+}
+
+docs {
+  Agregar un valor a un atributo (un color o talla nueva) (CATALOGO_GESTIONAR)
+}

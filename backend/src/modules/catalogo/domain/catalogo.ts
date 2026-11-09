@@ -32,6 +32,8 @@ export const varianteSchema = z.object({
   valoresAtributo: z.array(id).max(20).optional(),
 });
 
+export const valorAtributoSchema = z.object({ valor: textoCorto(100) });
+
 export const imagenSchema = z.object({ idVariante: id.nullish(), url: z.url().max(500), textoAlt: z.string().max(200).nullish(), orden: z.number().int().min(0).default(0) });
 
 export const busquedaSchema = paginado.extend({
@@ -69,6 +71,7 @@ export interface CatalogoRepository {
   listarMarcas(): Promise<Fila[]>;
   guardarMarca(actor: number, marca: Marca, idMarca?: number): Promise<number>;
   listarAtributos(): Promise<Fila[]>;
+  guardarValorAtributo(actor: number, idAtributo: number, valor: string): Promise<number>;
   buscarProductos(busqueda: Busqueda): Promise<Pagina>;
   listarProductosAdmin(actor: number, filtro: FiltroAdmin & Paginacion): Promise<Pagina>;
   obtenerProducto(referencia: { idProducto?: number; slug?: string }): Promise<DetalleProducto>;

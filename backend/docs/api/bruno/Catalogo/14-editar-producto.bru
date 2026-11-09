@@ -1,13 +1,17 @@
 meta {
-  name: Crear producto
+  name: Editar producto
   type: http
-  seq: 10
+  seq: 14
 }
 
-post {
-  url: {{baseUrl}}/api/v1/catalogo/productos
+put {
+  url: {{baseUrl}}/api/v1/catalogo/productos/:id
   body: json
   auth: inherit
+}
+
+params:path {
+  id: 1
 }
 
 body:json {
@@ -19,5 +23,5 @@ body:json {
 }
 
 docs {
-  Crear producto (CATALOGO_GESTIONAR)
+  Editar producto (CATALOGO_GESTIONAR)
 }

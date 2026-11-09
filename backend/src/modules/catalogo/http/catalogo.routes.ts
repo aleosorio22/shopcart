@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { booleanoQuery, dinero, id, idParam } from '../../../core/http/esquemas.js';
 import { ruta, type RutaDefinida } from '../../../core/http/route.js';
 import type { CatalogoService } from '../application/catalogo.service.js';
-import { busquedaSchema, categoriaSchema, filtroAdminSchema, imagenSchema, marcaSchema, productoSchema, varianteSchema } from '../domain/catalogo.js';
+import { busquedaSchema, categoriaSchema, filtroAdminSchema, imagenSchema, marcaSchema, productoSchema, valorAtributoSchema, varianteSchema } from '../domain/catalogo.js';
 
 const CATALOGO = 'CATALOGO_GESTIONAR';
 const PRECIOS = 'PRECIOS_GESTIONAR';
@@ -20,6 +20,10 @@ const rutasCategorias = (s: CatalogoService): RutaDefinida[] => [
   ruta({ metodo: 'post', ruta: '/marcas', resumen: 'Crear marca', permiso: CATALOGO, status: 201, body: marcaSchema, manejar: ({ idUsuario, body }) => s.guardarMarca(idUsuario, body) }),
   ruta({ metodo: 'put', ruta: '/marcas/:id', resumen: 'Editar marca', permiso: CATALOGO, params: idParam, body: marcaSchema, manejar: ({ idUsuario, body, params }) => s.guardarMarca(idUsuario, body, params.id) }),
   ruta({ metodo: 'get', ruta: '/atributos', resumen: 'Listar atributos y valores', acceso: 'publico', manejar: () => s.listarAtributos() }),
+  ruta({
+    metodo: 'post', ruta: '/atributos/:id/valores', resumen: 'Agregar un valor a un atributo (un color o talla nueva)', permiso: CATALOGO, status: 201, params: idParam, body: valorAtributoSchema,
+    manejar: ({ idUsuario, params, body }) => s.agregarValorAtributo(idUsuario, params.id, body.valor),
+  }),
 ];
 
 const rutasProductos = (s: CatalogoService): RutaDefinida[] => [

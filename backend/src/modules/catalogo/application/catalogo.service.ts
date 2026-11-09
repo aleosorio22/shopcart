@@ -29,6 +29,10 @@ export class CatalogoService {
     return this.repositorio.listarAtributos();
   }
 
+  async agregarValorAtributo(actor: number, idAtributo: number, valor: string): Promise<{ idValorAtributo: number }> {
+    return { idValorAtributo: await this.repositorio.guardarValorAtributo(actor, idAtributo, valor) };
+  }
+
   buscarProductos(busqueda: Busqueda): Promise<Pagina> {
     if (busqueda.precioMinimo !== undefined && busqueda.precioMaximo !== undefined && busqueda.precioMinimo > busqueda.precioMaximo) {
       throw AppError.datosInvalidos([{ campo: 'precioMinimo', mensaje: 'No puede ser mayor que precioMaximo' }]);

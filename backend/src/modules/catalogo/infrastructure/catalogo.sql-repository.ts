@@ -42,6 +42,13 @@ export class CatalogoSqlRepository implements CatalogoRepository {
     return this.db.consultar('Api.SP_Catalogo_ListarAtributos');
   }
 
+  async guardarValorAtributo(actor: number, idAtributo: number, valor: string): Promise<number> {
+    const filas = await this.db.consultar<{ IDValorAtributo: number }>('Api.SP_Catalogo_GuardarValorAtributo', {
+      IDUsuarioActor: sp.int(actor), IDAtributo: sp.int(idAtributo), Valor: sp.texto(valor),
+    });
+    return unico(filas).IDValorAtributo;
+  }
+
   async buscarProductos(busqueda: Busqueda): Promise<Pagina> {
     const filas = await this.db.consultar('Api.SP_Catalogo_BuscarProductos', {
       Texto: sp.texto(busqueda.texto),

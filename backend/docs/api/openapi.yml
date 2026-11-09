@@ -833,6 +833,44 @@ paths:
           description: Correcto
         "400":
           description: Datos invalidos
+  /api/v1/catalogo/atributos/{id}/valores:
+    post:
+      tags:
+        - Catalogo
+      summary: Agregar un valor a un atributo (un color o talla nueva)
+        (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valor:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+              required:
+                - valor
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
   /api/v1/catalogo/productos:
     get:
       tags:
