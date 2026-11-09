@@ -7,6 +7,7 @@ import { mensajeDe } from '../../api/error';
 import { ImagenProducto } from '../../components/tienda/ImagenProducto';
 import { Boton, EnlaceBoton } from '../../components/ui/Boton';
 import { Consulta, EstadoVacio } from '../../components/ui/Estados';
+import { SelectorCantidad } from '../../components/ui/SelectorCantidad';
 import { useAuth } from '../../context/AuthContext';
 import { useAccionesCarrito, useCarrito } from '../../hooks/useCarrito';
 import type { Carrito, LineaCarrito } from '../../services/carrito.service';
@@ -33,19 +34,13 @@ function Linea({ linea }: { linea: LineaCarrito }) {
           {!linea.Vendible && <p className="mt-1 text-[14px] text-peligro">Ya no hay existencia suficiente. Reduce la cantidad o quítalo.</p>}
         </div>
         <div className="flex items-center gap-4 sm:flex-col sm:items-end">
-          <select
-            aria-label={`Cantidad de ${linea.NombreProducto}`}
-            value={linea.Cantidad}
-            disabled={ocupada}
-            onChange={(evento) => cambiarCantidad.mutate({ idVariante: linea.IDVariante, cantidad: Number(evento.target.value) })}
-            className="rounded-full bg-nube px-3 py-1.5 outline-none"
-          >
-            {Array.from({ length: Math.min(maximo, 20) }, (_, indice) => indice + 1).map((numero) => (
-              <option key={numero} value={numero}>
-                {numero}
-              </option>
-            ))}
-          </select>
+          <SelectorCantidad
+            etiqueta={`Cantidad de ${linea.NombreProducto}`}
+            valor={linea.Cantidad}
+            maximo={maximo}
+            deshabilitado={ocupada}
+            alCambiar={(cantidad) => cambiarCantidad.mutate({ idVariante: linea.IDVariante, cantidad })}
+          />
           <span className="text-[19px] font-semibold">{quetzales(linea.Subtotal)}</span>
           {linea.DescuentoUnitario > 0 && <s className="text-[13px] text-tinta-tenue">{quetzales(linea.PrecioLista * linea.Cantidad)}</s>}
           <button onClick={() => quitar.mutate(linea.IDVariante)} disabled={ocupada} className="inline-flex items-center gap-1 text-[14px] text-enlace hover:underline">

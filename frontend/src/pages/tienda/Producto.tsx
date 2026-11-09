@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { HiMinus, HiOutlineBuildingStorefront, HiOutlineShieldCheck, HiOutlineTruck, HiPlus } from 'react-icons/hi2';
+import { HiOutlineBuildingStorefront, HiOutlineShieldCheck, HiOutlineTruck } from 'react-icons/hi2';
 import { Link, useParams } from 'react-router-dom';
 import { ImagenProducto } from '../../components/tienda/ImagenProducto';
 import { Precio } from '../../components/tienda/Precio';
 import { Boton } from '../../components/ui/Boton';
 import { Consulta, EstadoVacio } from '../../components/ui/Estados';
+import { SelectorCantidad } from '../../components/ui/SelectorCantidad';
 import { useAccionesCarrito } from '../../hooks/useCarrito';
 import { useDetalleProducto } from '../../hooks/useCatalogo';
 import { checkoutService } from '../../services/checkout.service';
@@ -91,17 +92,7 @@ function Ficha({ detalle }: { detalle: DetalleProducto }) {
 
         {variante && variante.Disponible > 0 ? (
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center rounded-full bg-nube" role="group" aria-label="Cantidad">
-              <button className="p-3 disabled:opacity-30" onClick={() => setCantidad((actual) => actual - 1)} disabled={cantidad <= 1} aria-label="Restar uno">
-                <HiMinus />
-              </button>
-              <span className="w-8 text-center" aria-live="polite">
-                {cantidad}
-              </span>
-              <button className="p-3 disabled:opacity-30" onClick={() => setCantidad((actual) => actual + 1)} disabled={cantidad >= maximo} aria-label="Sumar uno">
-                <HiPlus />
-              </button>
-            </div>
+            <SelectorCantidad valor={cantidad} maximo={maximo} alCambiar={setCantidad} />
             <Boton tamano="lg" className="flex-1" cargando={agregar.isPending} onClick={() => agregar.mutate({ idVariante: variante.IDVariante, cantidad })}>
               Agregar a la bolsa
             </Boton>
