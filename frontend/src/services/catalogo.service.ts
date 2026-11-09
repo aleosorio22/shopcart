@@ -129,6 +129,8 @@ export const catalogoService = {
   categorias: (incluirInactivas = false) => obtener<Categoria[]>('/catalogo/categorias', { incluirInactivas: incluirInactivas || undefined }),
   marcas: () => obtener<Marca[]>('/catalogo/marcas'),
   atributos: () => obtener<ValorAtributo[]>('/catalogo/atributos'),
+  agregarValorAtributo: (idAtributo: number, valor: string) =>
+    enviar<{ idValorAtributo: number }>('post', `/catalogo/atributos/${idAtributo}/valores`, { valor }),
   buscar: (filtro: FiltroCatalogo) => obtenerPagina<ProductoResumen>('/catalogo/productos', filtro),
   detalle: (referencia: string | number) => obtener<DetalleProducto>(`/catalogo/productos/${referencia}`),
   listarAdmin: (filtro: FiltroProductosAdmin) => obtenerPagina<ProductoAdmin>('/catalogo/admin/productos', filtro),

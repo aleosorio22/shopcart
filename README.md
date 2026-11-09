@@ -225,7 +225,7 @@ stateDiagram-v2
 ```
 shopcart/
 ├── database/
-│   ├── scripts/        001 a 016, numerados y versionados
+│   ├── scripts/        001 a 017, numerados y versionados
 │   ├── docs/           Diseño, normalización y diagrama ER
 │   └── ejecutar.sh     Aplica los scripts en orden
 ├── backend/

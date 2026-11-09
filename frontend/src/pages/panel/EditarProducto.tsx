@@ -16,6 +16,72 @@ import { fechaYHora, quetzales } from '../../utils/formato';
 
 const SKU = /^[A-Za-z0-9-]{1,40}$/;
 
+/** Agrega un valor nuevo (un color, una talla) al atributo sin salir del formulario de la variante. */
+function NuevoValor({ idAtributo, nombre, alCrear }: { idAtributo: number; nombre: string; alCrear: (idValor: number) => void }) {
+  const queryClient = useQueryClient();
+  const [abierto, setAbierto] = useState(false);
+  const [valor, setValor] = useState('');
+  const [error, setError] = useState<string>();
+
+  const crear = useMutation({
+    mutationFn: () => catalogoService.agregarValorAtributo(idAtributo, valor.trim()),
+    onSuccess: async ({ idValorAtributo }) => {
+      await queryClient.invalidateQueries({ queryKey: ['atributos'] });
+      toast.success(`${nombre} “${valor.trim()}” agregado`);
+      alCrear(idValorAtributo);
+      setValor('');
+      setAbierto(false);
+    },
+    // VALOR_DUPLICADO llega cuando ya existe, aunque cambien mayusculas o acentos.
+    onError: (fallo) => setError(mensajeDe(fallo)),
+  });
+
+  if (!abierto)
+    return (
+      <button type="button" onClick={() => setAbierto(true)} className="inline-flex items-center gap-1 rounded-full border border-dashed border-linea px-3.5 py-1.5 text-[14px] text-enlace hover:border-accion">
+        <HiPlus aria-hidden /> Nuevo
+      </button>
+    );
+
+  return (
+    <div className="flex w-full flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <input
+          ref={(campo) => campo?.focus()}
+          value={valor}
+          maxLength={100}
+          placeholder={`Nuevo valor de ${nombre.toLowerCase()}`}
+          aria-label={`Nuevo valor de ${nombre}`}
+          aria-invalid={Boolean(error)}
+          onChange={(evento) => {
+            setValor(evento.target.value);
+            setError(undefined);
+          }}
+          onKeyDown={(evento) => {
+            if (evento.key === 'Enter' && valor.trim()) {
+              evento.preventDefault();
+              crear.mutate();
+            }
+            if (evento.key === 'Escape') setAbierto(false);
+          }}
+          className="min-w-0 flex-1 rounded-full border border-linea px-3.5 py-1.5 text-[14px] outline-none focus:border-accion"
+        />
+        <Boton tamano="sm" disabled={!valor.trim()} cargando={crear.isPending} onClick={() => crear.mutate()}>
+          Agregar
+        </Boton>
+        <Boton tamano="sm" variante="fantasma" onClick={() => setAbierto(false)}>
+          Cancelar
+        </Boton>
+      </div>
+      {error && (
+        <p role="alert" className="px-3.5 text-[13px] text-peligro">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function FormularioVariante({ idProducto, variante, alTerminar }: { idProducto: number; variante?: VarianteTienda; alTerminar: () => void }) {
   const queryClient = useQueryClient();
   const { data: atributos = [] } = useQuery({ queryKey: ['atributos'], queryFn: catalogoService.atributos, staleTime: Infinity });
@@ -75,6 +141,12 @@ function FormularioVariante({ idProducto, variante, alTerminar }: { idProducto: 
                 </button>
               );
             })}
+            <NuevoValor
+              idAtributo={opciones[0]!.IDAtributo}
+              nombre={nombre}
+              // El valor recien creado queda elegido, reemplazando al de su mismo atributo.
+              alCrear={(idValor) => setSeleccion([...valores.filter((id) => !opciones.some((otra) => otra.IDValorAtributo === id)), idValor])}
+            />
           </div>
         </fieldset>
       ))}
