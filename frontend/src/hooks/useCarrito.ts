@@ -1,12 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { mensajeDe } from '../api/error';
+import { useAuth } from '../context/AuthContext';
 import { carritoService, type Carrito } from '../services/carrito.service';
 
 export const CLAVE_CARRITO = ['carrito'] as const;
 
+/**
+ * El carrito depende de quien lo pide (invitado por cookie o usuario por token),
+ * asi que la clave incluye al dueno y la consulta espera a que la sesion se resuelva.
+ * Sin esa espera, al recargar se pediria como invitado y se veria una bolsa vacia.
+ */
+function useClaveCarrito() {
+  const { estado, perfil } = useAuth();
+  return { clave: [...CLAVE_CARRITO, perfil?.usuario.IDUsuario ?? 'invitado'] as const, lista: estado !== 'verificando' };
+}
+
 export function useCarrito() {
-  return useQuery({ queryKey: CLAVE_CARRITO, queryFn: carritoService.obtener, staleTime: 10_000 });
+  const { clave, lista } = useClaveCarrito();
+  return useQuery({ queryKey: clave, queryFn: carritoService.obtener, staleTime: 10_000, enabled: lista });
 }
 
 /**
@@ -15,7 +27,8 @@ export function useCarrito() {
  */
 export function useAccionesCarrito() {
   const queryClient = useQueryClient();
-  const actualizar = (carrito: Carrito) => queryClient.setQueryData(CLAVE_CARRITO, carrito);
+  const { clave } = useClaveCarrito();
+  const actualizar = (carrito: Carrito) => queryClient.setQueryData(clave, carrito);
   const alFallar = (error: unknown) => toast.error(mensajeDe(error));
 
   const agregar = useMutation({

@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { CuentaLayout } from '../layouts/CuentaLayout';
 import { PanelLayout } from '../layouts/PanelLayout';
 import { TiendaLayout } from '../layouts/TiendaLayout';
 import { MENU_PANEL } from './menuPanel';
@@ -13,6 +14,11 @@ const Producto = lazy(() => import('../pages/tienda/Producto'));
 const Bolsa = lazy(() => import('../pages/tienda/Bolsa'));
 const Ingresar = lazy(() => import('../pages/tienda/Ingresar'));
 const Registro = lazy(() => import('../pages/tienda/Registro'));
+const Checkout = lazy(() => import('../pages/tienda/Checkout'));
+const MisPedidos = lazy(() => import('../pages/cuenta/MisPedidos'));
+const DetallePedido = lazy(() => import('../pages/cuenta/DetallePedido'));
+const Direcciones = lazy(() => import('../pages/cuenta/Direcciones'));
+const Perfil = lazy(() => import('../pages/cuenta/Perfil'));
 const NoEncontrado = lazy(() => import('../pages/NoEncontrado'));
 
 /** /panel abre la primera seccion que el rol puede ver (el Operador no tiene dashboard). */
@@ -32,6 +38,29 @@ const router = createBrowserRouter([
       { path: 'bolsa', element: <Bolsa /> },
       { path: 'ingresar', element: <Ingresar /> },
       { path: 'registro', element: <Registro /> },
+      {
+        path: 'checkout',
+        element: (
+          <RutaProtegida>
+            <Checkout />
+          </RutaProtegida>
+        ),
+      },
+      {
+        path: 'cuenta',
+        element: (
+          <RutaProtegida>
+            <CuentaLayout />
+          </RutaProtegida>
+        ),
+        children: [
+          { index: true, element: <Navigate to="pedidos" replace /> },
+          { path: 'pedidos', element: <MisPedidos /> },
+          { path: 'pedidos/:id', element: <DetallePedido /> },
+          { path: 'direcciones', element: <Direcciones /> },
+          { path: 'perfil', element: <Perfil /> },
+        ],
+      },
       { path: '*', element: <NoEncontrado /> },
     ],
   },
