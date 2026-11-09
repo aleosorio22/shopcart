@@ -5,7 +5,8 @@ import { useForm, useWatch } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { CLAVE_DIRECCIONES, useMunicipios } from '../../hooks/useDirecciones';
-import { clientesService, type DatosDireccion, type Direccion } from '../../services/clientes.service';
+import { clientesService, type DatosDireccion, type Direccion, type Municipio } from '../../services/clientes.service';
+import { EstadoCargando } from '../ui/Estados';
 import { mostrarErrorApi } from '../../utils/formularios';
 import { Boton } from '../ui/Boton';
 import { Campo, Casilla, Selector } from '../ui/Campo';
@@ -29,9 +30,14 @@ interface Props {
   alGuardar: (idDireccion?: number) => void;
 }
 
-export function FormularioDireccion({ direccion, alGuardar }: Props) {
+export function FormularioDireccion(props: Props) {
+  const municipios = useMunicipios();
+  if (municipios.isPending) return <EstadoCargando />;
+  return <Formulario {...props} municipios={municipios.data ?? []} />;
+}
+
+function Formulario({ direccion, alGuardar, municipios }: Props & { municipios: Municipio[] }) {
   const queryClient = useQueryClient();
-  const { data: municipios = [] } = useMunicipios();
   const { register, handleSubmit, control, setError, setValue, formState } = useForm<Entrada, unknown, Datos>({
     resolver: zodResolver(esquema),
     defaultValues: {

@@ -143,8 +143,8 @@ function Ficha({ detalle }: { detalle: DetalleProducto }) {
             <dl className="divide-y divide-linea/70 text-[15px]">
               {detalle.especificaciones.map((especificacion, indice) => (
                 <div key={indice} className="flex justify-between gap-4 py-2.5">
-                  <dt className="text-tinta-suave">{String(especificacion.Nombre ?? especificacion.Atributo ?? '')}</dt>
-                  <dd>{String(especificacion.Valor ?? '')}</dd>
+                  <dt className="text-tinta-suave">{especificacion.Atributo}</dt>
+                  <dd>{especificacion.Valor}</dd>
                 </div>
               ))}
             </dl>

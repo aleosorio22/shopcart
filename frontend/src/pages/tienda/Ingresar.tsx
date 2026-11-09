@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Boton } from '../../components/ui/Boton';
 import { Campo } from '../../components/ui/Campo';
@@ -16,20 +16,18 @@ const esquema = z.object({
 type Datos = z.infer<typeof esquema>;
 
 export default function Ingresar() {
-  const { iniciarSesion, estado } = useAuth();
-  const navegar = useNavigate();
+  const { iniciarSesion, estado, esPersonal } = useAuth();
   const [parametros] = useSearchParams();
   const volver = parametros.get('volver');
   const { register, handleSubmit, setError, formState } = useForm<Datos>({ resolver: zodResolver(esquema) });
 
-  if (estado === 'autenticado') return <Navigate to={rutaSegura(volver, '/')} replace />;
+  // Al iniciar sesion el contexto cambia y esta linea redirige: el personal va al panel.
+  if (estado === 'autenticado') return <Navigate to={rutaSegura(volver, esPersonal ? '/panel' : '/')} replace />;
 
   const enviar = handleSubmit(async ({ correo, contrasena }) => {
     try {
       const perfil = await iniciarSesion(correo, contrasena);
       toast.success(`Hola, ${perfil.usuario.Nombres}`);
-      const inicio = perfil.usuario.Rol === 'CLIENTE' ? '/' : '/panel';
-      navegar(rutaSegura(volver, inicio), { replace: true });
     } catch (error) {
       mostrarErrorApi(error, setError, ['correo', 'contrasena']);
     }

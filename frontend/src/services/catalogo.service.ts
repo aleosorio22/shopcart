@@ -59,8 +59,8 @@ export interface DetalleProducto {
     Activo?: boolean;
   };
   variantes: VarianteTienda[];
-  imagenes: { IDImagen: number; IDVariante: number | null; Url: string; TextoAlt: string | null; Orden: number }[];
-  especificaciones: { Nombre?: string; Valor?: string; [columna: string]: unknown }[];
+  imagenes: { IDImagenProducto: number; IDVariante: number | null; Url: string; TextoAlt: string | null; Orden: number }[];
+  especificaciones: { Atributo: string; Valor: string }[];
 }
 export type OrdenCatalogo = 'RECIENTES' | 'PRECIO_ASC' | 'PRECIO_DESC' | 'NOMBRE';
 export interface FiltroCatalogo extends FiltroPaginado {
