@@ -8,7 +8,7 @@ Proyecto del **Tech Challenge 360** de Grupo Pentandra.
 |---|---|---|---|
 | Base de datos | Microsoft SQL Server 2019 o superior | [`database/`](database) | Fase 1: aplicada y probada en SQL Server |
 | Backend | Node.js 24, TypeScript estricto y Express 5 | [`backend/`](backend) | Fase 1: probado de punta a punta contra SQL Server |
-| Frontend | React 18 o superior con TypeScript | `frontend/` | Fase 2, pendiente |
+| Frontend | React 19, TypeScript estricto, Vite y Tailwind CSS | [`frontend/`](frontend) | Fase 2: tienda y panel probados contra el API real |
 
 ## Contenido
 
@@ -87,6 +87,28 @@ El API queda en `http://localhost:3000`. Para comprobarlo, `GET /health` respond
 
 Para producción: `npm run build && npm start`.
 
+### 3. Frontend
+
+Con el backend corriendo, en otra terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abre `http://localhost:5173`. Vite reenvía `/api` al backend en `http://localhost:3000`, así que el navegador ve un solo origen y la cookie del refresh token funciona sin configuración extra. Si el API está en otra dirección, copia `.env.example` a `.env` y cambia `VITE_API_PROXY`.
+
+Para una versión optimizada: `npm run build && npm run preview` (queda en `http://localhost:4173` con el mismo proxy).
+
+| Ruta | Quién | Qué hay |
+|---|---|---|
+| `/` y `/tienda` | Todos | Inicio, catálogo con filtros y ficha de producto |
+| `/bolsa` | Todos | Carrito, también de invitado |
+| `/checkout` | Con sesión | Entrega, reserva de 15 minutos y pago |
+| `/cuenta` | Con sesión | Pedidos, seguimiento, direcciones y perfil |
+| `/panel` | Operador y Administrador | Muestra solo las secciones que permite el rol |
+
 ## Credenciales de prueba
 
 Existen solo en los datos semilla. La contraseña de todos es `ShopCart#2026`.
@@ -99,7 +121,7 @@ Existen solo en los datos semilla. La contraseña de todos es `ShopCart#2026`.
 | `cliente2@shopcart.test` | Cliente | Igual que el anterior, para probar aislamiento |
 | `cliente3@shopcart.test` | Cliente | Igual que el anterior |
 
-**Pagos simulados.** Cualquier `tokenPago` se aprueba, y `tok_rechazada` se rechaza.
+**Pagos simulados.** Cualquier `tokenPago` se aprueba, y `tok_rechazada` se rechaza. En la tienda se eligen como "Tarjeta de prueba" y "Tarjeta rechazada"; nunca se piden datos reales de tarjeta.
 
 **Cupones de la semilla:**
 
@@ -214,7 +236,17 @@ shopcart/
 │   │   └── main.ts
 │   ├── tests/          Unitarias, de contrato y de punta a punta
 │   └── docs/api/       OpenAPI y colección de Bruno
-└── frontend/           Fase 2
+└── frontend/
+    └── src/
+        ├── api/        Cliente HTTP, renovación del token y errores
+        ├── services/   Una función por endpoint, con sus tipos
+        ├── hooks/      Consultas de TanStack Query y filtros en la URL
+        ├── context/    Sesión (AuthContext)
+        ├── routes/     Router, rutas protegidas y menú por permiso
+        ├── layouts/    Tienda, cuenta y panel
+        ├── components/ ui/ reutilizables, tienda/, panel/ y pedidos/
+        ├── pages/      tienda/, cuenta/ y panel/
+        └── test/       Pruebas con Vitest y Testing Library
 ```
 
 ### Monolito modular con arquitectura hexagonal
@@ -256,6 +288,28 @@ Hay 12 módulos: `auth`, `usuarios`, `clientes`, `catalogo`, `inventario`, `carr
 
 **Montos:** todos usan `DECIMAL(18,2)`, y el costo usa `DECIMAL(18,4)`; nunca `FLOAT` ni `REAL`. Las fechas se guardan en UTC, y los reportes usan la hora de Guatemala.
 
+### Frontend
+
+```mermaid
+flowchart LR
+    P[Página] --> H[Hook de TanStack Query]
+    H --> S[Servicio]
+    S --> C[Cliente axios]
+    C -->|/api/v1| API[Backend]
+    C -. 401 .-> R[Renovar token una sola vez]
+    R --> C
+```
+
+- **Páginas sin lógica de acceso a datos:** piden datos a un hook; el hook llama a un servicio; el servicio conoce la URL y los tipos. Es la misma separación por capas del backend.
+- **Estado del servidor en TanStack Query:** caché, reintentos, paginación sin parpadeo y estados de carga y error. El estado local se queda en cada componente y la sesión en `AuthContext`; no hace falta Redux.
+- **Sesión:** el access token vive solo en memoria y el refresh token en la cookie HttpOnly del backend. Al abrir la app se recupera la sesión con esa cookie. Si una petición recibe 401, el interceptor renueva el token **una sola vez** aunque fallen varias peticiones a la vez, porque el backend rota el refresh token y detecta su reutilización.
+- **Roles:** `routes/menuPanel.ts` es la fuente única del menú del panel. El mismo permiso decide si la opción se muestra y si la ruta deja entrar; un rol sin permiso ve una página 403. El backend vuelve a validar todo.
+- **Listados del lado del servidor:** `TablaDatos` solo dibuja la página recibida. Filtros, orden y página viajan al API y se guardan en la URL, así un listado filtrado se puede recargar o compartir.
+- **Estados obligatorios:** el componente `Consulta` resuelve en un lugar la carga, el error con botón de reintento y el vacío de cada vista.
+- **Formularios:** react-hook-form con esquemas zod que replican las reglas del backend, para avisar antes de enviar. Los errores 400 del API se colocan bajo el campo correspondiente.
+- **Pago:** cada intento usa una llave de idempotencia; un doble clic reusa la misma y el backend no cobra dos veces. La reserva muestra su cuenta regresiva.
+- **Diseño:** minimalista, inspirado en la tienda de Apple: fondo blanco, grises cálidos, un solo color de acción y tipografía del sistema. Las páginas se cargan bajo demanda, así el cliente no descarga el código del panel.
+
 ## Cómo se cumple cada requerimiento
 
 | Requerimiento | Implementación |
@@ -269,6 +323,16 @@ Hay 12 módulos: `auth`, `usuarios`, `clientes`, `catalogo`, `inventario`, `carr
 | **RF-07** Pedidos | Máquina de estados en datos y validada por trigger. Cancelaciones y devoluciones reintegran existencia por kardex. Una tarea libera cada minuto las reservas vencidas |
 | **RF-08** Reportes | Ventas por día, semana y mes; ventas por categoría; los 10 más vendidos; ticket promedio. Solo cuentan pedidos completados, y restan devoluciones |
 | **RF-09** Bitácora | Triggers registran usuario, fecha, entidad, acción, valor anterior y valor nuevo. No se puede modificar, borrar ni truncar |
+
+| Requisito del frontend | Implementación |
+|---|---|
+| Rutas protegidas y menús según el rol | `RutaProtegida` y `MENU_PANEL`: el Operador ve Pedidos, Reembolsos e Inventario; el Administrador, todo |
+| Formularios con validación y errores claros | react-hook-form + zod en registro, direcciones, productos, variantes, cupones, usuarios y movimientos |
+| Tablas con paginación, orden y filtros en el servidor | `TablaDatos` en pedidos, productos, existencias, kardex, cupones, usuarios y reembolsos |
+| Gráficas en el dashboard | Recharts: ventas por período, ventas por categoría, más vendidos y margen |
+| Estados de carga, vacío y error | Componente `Consulta` y esqueletos de carga en la tienda |
+| Renovación transparente del token | Interceptor de axios con una sola renovación compartida |
+| Interfaz responsive | Diseño móvil primero; menú lateral del panel en cajón y filtros plegables en el celular |
 
 ## Seguridad y autenticación
 
@@ -328,6 +392,22 @@ Respaldo de la idempotencia en la base: `SolicitudIdempotente`, `UQ_Pedido_Check
 | `dotenv` | Configuración por variables de entorno |
 | `vitest`, `supertest` | Pruebas unitarias y HTTP sin levantar un servidor |
 | `tsx`, `typescript`, `eslint` | Desarrollo, tipado estricto y estándar de código |
+
+En el frontend:
+
+| Librería | Por qué |
+|---|---|
+| `react` 19, `vite` | Exigido React 18 o superior; Vite da arranque y recarga inmediatos |
+| `react-router-dom` | Rutas anidadas por layout, rutas protegidas y carga diferida de páginas |
+| `@tanstack/react-query` | Estado del servidor: caché, carga, error, reintentos y paginación |
+| `axios` | Interceptores para el token y la renovación transparente |
+| `react-hook-form`, `zod` | Formularios con validación por campo y las mismas reglas que el backend |
+| `tailwindcss` 4 | Estilos con un tema propio de colores en `index.css` |
+| `@headlessui/react` | Modales y menús accesibles: foco atrapado y cierre con Escape |
+| `recharts` | Gráficas del dashboard |
+| `react-hot-toast`, `react-icons` | Notificaciones e íconos de trazo fino |
+| `vitest`, `@testing-library/react` | Pruebas de componentes y de la lógica de sesión |
+| `oxlint`, `prettier` | Estándar de código; `oxlint` viene con la plantilla de Vite e incluye reglas de React y accesibilidad |
 
 ### Otras decisiones
 
@@ -390,10 +470,13 @@ La colección genera la `Idempotency-Key` en cada envío y guarda el `idCheckout
 | Unitarias, de contrato y HTTP | `cd backend && npm test` | Autenticación, idempotencia, aislamiento, errores y seguridad HTTP, sin base de datos | 127 de 127 |
 | De punta a punta | `cd backend && npm run test:e2e` | Flujo real contra el API y SQL Server, incluidas la concurrencia y el doble clic | 51 de 51 |
 | De la base de datos | `cd database && ./ejecutar.sh --pruebas` | RF-01 a RF-09 directamente en SQL Server, incluidas inmutabilidad y transiciones | 33 de 33 |
+| Frontend | `cd frontend && npm test` | Renovación única del token, rutas por rol, tabla paginada, estados de carga y error, redirecciones seguras | 18 de 18 |
+
+El flujo completo del frontend también se recorrió en el navegador contra el API real: compra como cliente con cupón rechazado, pago rechazado y luego aprobado; avance de estado del pedido como Administrador; y acceso denegado al panel para un cliente.
 
 La prueba de contrato compara cada llamada del backend con la firma real del procedimiento en los scripts SQL, y falla si un parámetro no existe o falta uno obligatorio.
 
-Verificación estática: `npm run typecheck && npm run lint && npm run build`.
+Verificación estática, en `backend/` y en `frontend/`: `npm run typecheck && npm run lint && npm run build`.
 
 ## Limitaciones y mejoras posibles
 
@@ -405,5 +488,8 @@ Verificación estática: `npm run typecheck && npm run lint && npm run build`.
 - **Sesiones.** La rotación del refresh token no tiene margen de gracia: dos pestañas renovando a la vez pueden cerrar la sesión.
 - **Administradores del servidor.** Un `sysadmin` puede saltarse triggers y permisos. Para protección total se requiere SQL Server Audit.
 - **Extras opcionales pendientes:** dashboard en tiempo real, exportación a Excel o PDF, y caché de reportes.
+- **Imágenes de producto.** La semilla no trae fotos; la tienda muestra un ícono por categoría. El API ya acepta imágenes por URL.
+- **Edición de productos inactivos.** El panel lee el detalle desde el endpoint público, que solo devuelve productos activos; uno inactivo se reactiva con los datos del listado. Un endpoint de detalle para administración lo resolvería.
+- **Varias pestañas.** La renovación del token se comparte dentro de una pestaña, no entre pestañas (ver la limitación de sesiones).
 
 El diseño completo de la base, con normalización y extras, está en [database/docs/Diseno_BD.md](database/docs/Diseno_BD.md).
