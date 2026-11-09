@@ -34,7 +34,9 @@ export const varianteSchema = z.object({
 
 export const valorAtributoSchema = z.object({ valor: textoCorto(100) });
 
-export const imagenSchema = z.object({ idVariante: id.nullish(), url: z.url().max(500), textoAlt: z.string().max(200).nullish(), orden: z.number().int().min(0).default(0) });
+// Una imagen puede ser una URL externa o un archivo servido por el propio sistema (/img/..., /uploads/...).
+const rutaImagen = z.string().regex(/^\/(?!\/)[\w\-./]+\.(?:webp|jpe?g|png|avif)$/i, 'Ruta de imagen invalida');
+export const imagenSchema = z.object({ idVariante: id.nullish(), url: z.union([z.url({ protocol: /^https?$/ }), rutaImagen]).pipe(z.string().max(500)), textoAlt: z.string().max(200).nullish(), orden: z.number().int().min(0).default(0) });
 
 export const busquedaSchema = paginado.extend({
   texto: z.string().trim().max(100).optional(),

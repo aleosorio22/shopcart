@@ -19,7 +19,7 @@ interface Props {
 
 /** Usa la foto del producto; si no tiene, dibuja un icono sobrio segun su categoria. */
 export function ImagenProducto({ url, nombre, categoria, className = '' }: Props) {
-  if (url) return <img src={url} alt={nombre} loading="lazy" className={`h-full w-full object-contain ${className}`} />;
+  if (url) return <img src={url} alt={nombre} loading="lazy" decoding="async" className={`h-full w-full object-cover ${className}`} />;
   const Icono = ICONOS.find(([patron]) => patron.test(`${categoria ?? ''} ${nombre}`))?.[1] ?? HiOutlineShoppingBag;
   return (
     <div className={`flex h-full w-full items-center justify-center bg-gradient-to-b from-[#fbfbfd] to-nube ${className}`}>
