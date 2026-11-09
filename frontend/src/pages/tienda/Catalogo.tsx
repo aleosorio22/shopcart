@@ -26,6 +26,8 @@ export default function Catalogo() {
   const { valores, pagina, actualizar, irAPagina } = useFiltrosUrl(FILTROS);
   const { data: categorias = [] } = useCategorias();
   const { data: marcas = [] } = useMarcas();
+  // En pantallas chicas los filtros se pliegan para que los productos queden a la vista.
+  const [filtrosVisibles, setFiltrosVisibles] = useState(false);
 
   // El rango de precio se escribe a mano: se espera a que el usuario termine.
   const [rango, setRango] = useState({ min: valores.min ?? '', max: valores.max ?? '' });
@@ -61,8 +63,11 @@ export default function Catalogo() {
     <div className="contenedor-ancho py-10">
       <h1 className="text-[40px] font-semibold leading-tight sm:text-[48px]">{titulo}</h1>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[220px_1fr]">
-        <aside aria-label="Filtros" className="space-y-5 text-[15px]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[220px_1fr] lg:gap-10">
+        <Boton variante="secundario" tamano="sm" className="w-fit lg:hidden" aria-expanded={filtrosVisibles} onClick={() => setFiltrosVisibles((visible) => !visible)}>
+          {filtrosVisibles ? 'Ocultar filtros' : 'Filtrar'}
+        </Boton>
+        <aside aria-label="Filtros" className={`space-y-5 text-[15px] ${filtrosVisibles ? '' : 'hidden lg:block'}`}>
           <Selector etiqueta="Categoría" value={valores.categoria ?? ''} onChange={(evento) => actualizar({ categoria: evento.target.value })}>
             <option value="">Todas</option>
             {categorias

@@ -10,7 +10,7 @@ import { pedidosService, type PedidoResumen } from '../../services/pedidos.servi
 import { fecha, quetzales } from '../../utils/formato';
 
 const COLUMNAS: Columna<PedidoResumen>[] = [
-  { titulo: 'Pedido', celda: (pedido) => <span className="font-medium">{pedido.NumeroPedido}</span> },
+  { titulo: 'Pedido', celda: (pedido) => <span className="whitespace-nowrap font-medium">{pedido.NumeroPedido}</span> },
   { titulo: 'Fecha', celda: (pedido) => fecha(pedido.FechaPedido), secundaria: true },
   { titulo: 'Estado', celda: (pedido) => <InsigniaEstado estado={pedido.Estado} /> },
   { titulo: 'Total', celda: (pedido) => quetzales(pedido.Total), alinear: 'derecha' },

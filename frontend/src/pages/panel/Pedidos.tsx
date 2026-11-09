@@ -12,7 +12,7 @@ import { fechaYHora, quetzales } from '../../utils/formato';
 import { ETIQUETA_ESTADO } from '../../utils/pedidos';
 
 const COLUMNAS: Columna<PedidoResumen>[] = [
-  { titulo: 'Pedido', celda: (pedido) => <span className="font-medium">{pedido.NumeroPedido}</span> },
+  { titulo: 'Pedido', celda: (pedido) => <span className="whitespace-nowrap font-medium">{pedido.NumeroPedido}</span> },
   { titulo: 'Fecha', celda: (pedido) => fechaYHora(pedido.FechaPedido), orden: { asc: 'FECHA_ASC', desc: 'FECHA_DESC' }, secundaria: true },
   {
     titulo: 'Cliente',
