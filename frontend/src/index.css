@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+/* Paleta sobria: blanco, grises calidos y un solo color de accion. */
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --color-tinta: #1d1d1f;
+  --color-tinta-suave: #6e6e73;
+  --color-tinta-tenue: #86868b;
+  --color-nube: #f5f5f7;
+  --color-linea: #d2d2d7;
+  --color-accion: #0071e3;
+  --color-accion-hover: #0077ed;
+  --color-enlace: #0066cc;
+  --color-exito: #1d8a3a;
+  --color-alerta: #b25000;
+  --color-peligro: #d70015;
+  --radius-tarjeta: 18px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-white text-tinta;
+    font-size: 17px;
+    letter-spacing: -0.022em;
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accion);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .contenedor {
+    @apply mx-auto w-full max-w-[1024px] px-4 sm:px-6;
+  }
+  .contenedor-ancho {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6;
+  }
+  .enlace {
+    @apply text-enlace hover:underline;
+  }
+}
