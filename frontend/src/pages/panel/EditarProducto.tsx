@@ -5,6 +5,7 @@ import { HiPlus } from 'react-icons/hi2';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { mensajeDe } from '../../api/error';
 import { FormularioProducto } from '../../components/panel/FormularioProducto';
+import { GestorImagenes } from '../../components/panel/GestorImagenes';
 import { Tarjeta } from '../../components/panel/Tarjeta';
 import { Boton } from '../../components/ui/Boton';
 import { Campo, Casilla } from '../../components/ui/Campo';
@@ -306,6 +307,12 @@ export default function EditarProducto() {
           </ul>
         )}
       </Tarjeta>
+
+      {detalle.data && (
+        <Tarjeta titulo="Imágenes">
+          <GestorImagenes idProducto={idProducto} nombreProducto={inicial.nombre} imagenes={detalle.data.imagenes} variantes={variantes} />
+        </Tarjeta>
+      )}
 
       <Modal abierto={dialogo?.tipo === 'variante'} alCerrar={() => setDialogo(null)} titulo={dialogo?.variante ? 'Editar variante' : 'Nueva variante'}>
         {dialogo?.tipo === 'variante' && <FormularioVariante idProducto={idProducto} variante={dialogo.variante} alTerminar={() => setDialogo(null)} />}

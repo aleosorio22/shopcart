@@ -142,5 +142,11 @@ export const catalogoService = {
   editarVariante: (idProducto: number, idVariante: number, datos: DatosVariante) =>
     enviar<{ idVariante: number }>('put', `/catalogo/productos/${idProducto}/variantes/${idVariante}`, datos),
   cambiarPrecio: (idVariante: number, precio: number) => enviar('put', `/catalogo/variantes/${idVariante}/precio`, { precio }),
+  /** Sube el archivo tal cual (cuerpo binario) y devuelve la URL donde quedo guardado. */
+  subirArchivo: (archivo: File) =>
+    enviar<{ url: string }>('post', '/catalogo/imagenes/archivo', archivo, { headers: { 'Content-Type': archivo.type }, timeout: 60_000 }),
+  agregarImagen: (idProducto: number, datos: { url: string; textoAlt?: string; idVariante?: number; orden: number }) =>
+    enviar<{ idImagenProducto: number }>('post', `/catalogo/productos/${idProducto}/imagenes`, datos),
+  eliminarImagen: (idImagen: number) => enviar('delete', `/catalogo/imagenes/${idImagen}`),
   historialPrecios: (idVariante: number) => obtener<PrecioHistorico[]>(`/catalogo/variantes/${idVariante}/precios`),
 };

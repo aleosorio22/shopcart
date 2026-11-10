@@ -82,6 +82,7 @@ Completa `.env` antes de arrancar. El API valida todas las variables al iniciar 
 | `JWT_SECRET` | Resultado de `openssl rand -base64 48`; mínimo 32 caracteres |
 | `DB_TRUST_CERT` | `true` si el servidor usa un certificado autofirmado |
 | `CORS_ORIGINS` | Orígenes del frontend, separados por coma |
+| `UPLOADS_DIR` | Carpeta de las imágenes subidas desde el panel; por defecto `uploads` |
 
 El API queda en `http://localhost:3000`. Para comprobarlo, `GET /health` responde `{"success":true,...}`.
 
@@ -225,7 +226,7 @@ stateDiagram-v2
 ```
 shopcart/
 ├── database/
-│   ├── scripts/        001 a 017, numerados y versionados
+│   ├── scripts/        001 a 018, numerados y versionados
 │   ├── docs/           Diseño, normalización y diagrama ER
 │   └── ejecutar.sh     Aplica los scripts en orden
 ├── backend/
@@ -307,6 +308,7 @@ flowchart LR
 - **Listados del lado del servidor:** `TablaDatos` solo dibuja la página recibida. Filtros, orden y página viajan al API y se guardan en la URL, así un listado filtrado se puede recargar o compartir.
 - **Estados obligatorios:** el componente `Consulta` resuelve en un lugar la carga, el error con botón de reintento y el vacío de cada vista.
 - **Formularios:** react-hook-form con esquemas zod que replican las reglas del backend, para avisar antes de enviar. Los errores 400 del API se colocan bajo el campo correspondiente.
+- **Imágenes:** el panel sube la foto como cuerpo binario a `POST /catalogo/imagenes/archivo` y luego la asocia al producto, en general o a una variante. El servidor identifica el formato por la firma del archivo (JPG, PNG o WEBP), genera el nombre y limita el tamaño a 5 MB; ignora el nombre y el tipo que declara el navegador.
 - **Pago:** cada intento usa una llave de idempotencia; un doble clic reusa la misma y el backend no cobra dos veces. La reserva muestra su cuenta regresiva.
 - **Diseño:** minimalista, inspirado en la tienda de Apple: fondo blanco, grises cálidos, un solo color de acción y tipografía del sistema. Las páginas se cargan bajo demanda, así el cliente no descarga el código del panel.
 
@@ -467,10 +469,12 @@ La colección genera la `Idempotency-Key` en cada envío y guarda el `idCheckout
 
 | Tipo | Comando | Qué cubre | Resultado |
 |---|---|---|---|
-| Unitarias, de contrato y HTTP | `cd backend && npm test` | Autenticación, idempotencia, aislamiento, errores y seguridad HTTP, sin base de datos | 127 de 127 |
+| Unitarias, de contrato y HTTP | `cd backend && npm test` | Autenticación, idempotencia, aislamiento, errores y seguridad HTTP, sin base de datos | 132 de 132 |
 | De punta a punta | `cd backend && npm run test:e2e` | Flujo real contra el API y SQL Server, incluidas la concurrencia y el doble clic | 51 de 51 |
 | De la base de datos | `cd database && ./ejecutar.sh --pruebas` | RF-01 a RF-09 directamente en SQL Server, incluidas inmutabilidad y transiciones | 33 de 33 |
 | Frontend | `cd frontend && npm test` | Renovación única del token, rutas por rol, tabla paginada, estados de carga y error, redirecciones seguras | 18 de 18 |
+
+Las fotos de demostración de `frontend/public/img` son de [Unsplash](https://unsplash.com/license), de uso libre. El script `018_Semilla_Imagenes.sql` las asocia a los productos de la semilla.
 
 El flujo completo del frontend también se recorrió en el navegador contra el API real: compra como cliente con cupón rechazado, pago rechazado y luego aprobado; avance de estado del pedido como Administrador; y acceso denegado al panel para un cliente.
 
@@ -488,7 +492,7 @@ Verificación estática, en `backend/` y en `frontend/`: `npm run typecheck && n
 - **Sesiones.** La rotación del refresh token no tiene margen de gracia: dos pestañas renovando a la vez pueden cerrar la sesión.
 - **Administradores del servidor.** Un `sysadmin` puede saltarse triggers y permisos. Para protección total se requiere SQL Server Audit.
 - **Extras opcionales pendientes:** dashboard en tiempo real, exportación a Excel o PDF, y caché de reportes.
-- **Imágenes de producto.** La semilla no trae fotos; la tienda muestra un ícono por categoría. El API ya acepta imágenes por URL.
+- **Imágenes guardadas en disco.** Las fotos que sube el panel quedan en `backend/uploads/` (configurable con `UPLOADS_DIR`) y el API las sirve en `/uploads`. Sirve para la demo; con varias instancias o en la nube debe usarse un almacén de objetos (S3, Azure Blob) implementando el puerto `AlmacenImagenes`. Quitar una imagen del producto no borra su archivo.
 - **Edición de productos inactivos.** El panel lee el detalle desde el endpoint público, que solo devuelve productos activos; uno inactivo se reactiva con los datos del listado. Un endpoint de detalle para administración lo resolvería.
 - **Varias pestañas.** La renovación del token se comparte dentro de una pestaña, no entre pestañas (ver la limitación de sesiones).
 

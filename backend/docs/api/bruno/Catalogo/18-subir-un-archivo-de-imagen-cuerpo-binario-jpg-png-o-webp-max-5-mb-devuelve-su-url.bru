@@ -1,0 +1,15 @@
+meta {
+  name: Subir un archivo de imagen (cuerpo binario JPG PNG o WEBP max. 5 MB) devuelve su URL
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/api/v1/catalogo/imagenes/archivo
+  body: none
+  auth: inherit
+}
+
+docs {
+  Subir un archivo de imagen (cuerpo binario JPG, PNG o WEBP, max. 5 MB); devuelve su URL (CATALOGO_GESTIONAR)
+}

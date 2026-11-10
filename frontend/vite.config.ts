@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 // El API se sirve por el mismo origen gracias al proxy: la cookie del refresh
 // (SameSite=Strict, path /api/v1/auth) viaja sin configurar CORS en el navegador.
 const API = process.env.VITE_API_PROXY ?? 'http://localhost:3000';
-const proxy = { '/api': { target: API, changeOrigin: true } };
+const proxy = { '/api': { target: API, changeOrigin: true }, '/uploads': { target: API, changeOrigin: true } };
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

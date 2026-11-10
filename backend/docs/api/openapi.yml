@@ -1314,6 +1314,23 @@ paths:
           description: Token ausente, invalido o expirado
         "403":
           description: Sin permiso
+  /api/v1/catalogo/imagenes/archivo:
+    post:
+      tags:
+        - Catalogo
+      summary: Subir un archivo de imagen (cuerpo binario JPG, PNG o WEBP, max. 5 MB);
+        devuelve su URL (CATALOGO_GESTIONAR)
+      security: *a2
+      parameters: []
+      responses:
+        "201":
+          description: Correcto
+        "400":
+          description: Datos invalidos
+        "401":
+          description: Token ausente, invalido o expirado
+        "403":
+          description: Sin permiso
   /api/v1/catalogo/productos/{id}/imagenes:
     post:
       tags:
@@ -1343,9 +1360,11 @@ paths:
                   exclusiveMinimum: true
                   maximum: 9007199254740991
                 url:
-                  type: string
-                  maxLength: 500
-                  format: uri
+                  anyOf:
+                    - type: string
+                      format: uri
+                    - type: string
+                      pattern: ^\/(?!\/)[\w\-./]+\.(?:webp|jpe?g|png|avif)$
                 textoAlt:
                   nullable: true
                   type: string
