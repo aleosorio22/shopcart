@@ -27,6 +27,7 @@ const DetallePedidoPanel = lazy(() => import('../pages/panel/DetallePedidoPanel'
 const Reembolsos = lazy(() => import('../pages/panel/Reembolsos'));
 const Productos = lazy(() => import('../pages/panel/Productos'));
 const EditarProducto = lazy(() => import('../pages/panel/EditarProducto'));
+const Categorias = lazy(() => import('../pages/panel/Categorias'));
 const Inventario = lazy(() => import('../pages/panel/Inventario'));
 const Cupones = lazy(() => import('../pages/panel/Cupones'));
 const Usuarios = lazy(() => import('../pages/panel/Usuarios'));
@@ -93,6 +94,7 @@ const router = createBrowserRouter([
       { path: 'reembolsos', element: conPermiso('PEDIDOS_GESTIONAR', <Reembolsos />) },
       { path: 'productos', element: conPermiso('CATALOGO_GESTIONAR', <Productos />) },
       { path: 'productos/:id', element: conPermiso('CATALOGO_GESTIONAR', <EditarProducto />) },
+      { path: 'categorias', element: conPermiso('CATALOGO_GESTIONAR', <Categorias />) },
       { path: 'inventario', element: conPermiso('INVENTARIO_GESTIONAR', <Inventario />) },
       { path: 'cupones', element: conPermiso('CUPONES_GESTIONAR', <Cupones />) },
       { path: 'usuarios', element: conPermiso('USUARIOS_GESTIONAR', <Usuarios />) },

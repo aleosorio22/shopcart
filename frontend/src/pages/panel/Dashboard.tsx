@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, Bar, BarChart, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Encabezado } from '../../components/panel/Encabezado';
 import { Indicador, Tarjeta } from '../../components/panel/Tarjeta';
 import { Campo, Selector } from '../../components/ui/Campo';
@@ -53,7 +53,7 @@ function GraficaVentas({ rango }: { rango: Rango }) {
         {(ventas) => (
           <div className="h-72">
             <ResponsiveContainer>
-              <AreaChart data={ventas.map((venta) => ({ periodo: fecha(venta.Periodo), monto: venta.MontoNeto, pedidos: Number(venta.NumeroPedidos) }))}>
+              <ComposedChart data={ventas.map((venta) => ({ periodo: fecha(venta.Periodo), monto: venta.MontoNeto, pedidos: Number(venta.NumeroPedidos) }))}>
                 <defs>
                   <linearGradient id="relleno" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={ACCION} stopOpacity={0.25} />
@@ -62,10 +62,17 @@ function GraficaVentas({ rango }: { rango: Rango }) {
                 </defs>
                 <CartesianGrid vertical={false} stroke="#e5e5ea" />
                 <XAxis dataKey="periodo" tickLine={false} axisLine={false} fontSize={12} />
-                <YAxis tickFormatter={(valor: number) => `Q${compacto.format(valor)}`} tickLine={false} axisLine={false} fontSize={12} width={56} />
-                <Tooltip formatter={(valor) => quetzales(Number(valor))} labelStyle={{ fontWeight: 600 }} contentStyle={{ borderRadius: 12, border: 'none' }} />
-                <Area type="monotone" dataKey="monto" name="Ventas" stroke={ACCION} strokeWidth={2} fill="url(#relleno)" />
-              </AreaChart>
+                <YAxis yAxisId="monto" tickFormatter={(valor: number) => `Q${compacto.format(valor)}`} tickLine={false} axisLine={false} fontSize={12} width={56} />
+                <YAxis yAxisId="pedidos" orientation="right" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} width={32} />
+                <Tooltip
+                  formatter={(valor, nombre) => (nombre === 'Pedidos' ? entero(Number(valor)) : quetzales(Number(valor)))}
+                  labelStyle={{ fontWeight: 600 }}
+                  contentStyle={{ borderRadius: 12, border: 'none' }}
+                />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
+                <Area yAxisId="monto" type="monotone" dataKey="monto" name="Ventas (Q)" stroke={ACCION} strokeWidth={2} fill="url(#relleno)" />
+                <Line yAxisId="pedidos" type="monotone" dataKey="pedidos" name="Pedidos" stroke="#86868b" strokeWidth={2} dot={{ r: 3 }} />
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         )}
@@ -97,9 +104,9 @@ function GraficaCategorias({ rango }: { rango: Rango }) {
 }
 
 function TopProductos({ rango }: { rango: Rango }) {
-  const consulta = useQuery({ queryKey: ['reportes', 'top', rango], queryFn: () => reportesService.topProductos(rango, 5) });
+  const consulta = useQuery({ queryKey: ['reportes', 'top', rango], queryFn: () => reportesService.topProductos(rango, 10) });
   return (
-    <Tarjeta titulo="Más vendidos">
+    <Tarjeta titulo="Los 10 más vendidos">
       <Consulta consulta={consulta} esVacio={sinDatos} vacio={<EstadoVacio titulo="Sin ventas" />}>
         {(productos) => (
           <ol className="space-y-3">

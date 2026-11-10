@@ -10,6 +10,14 @@ export interface Categoria {
   Orden: number;
   Activo: boolean;
 }
+export interface DatosCategoria {
+  idCategoriaPadre?: number | null;
+  nombre: string;
+  slug: string;
+  descripcion?: string | null;
+  orden: number;
+  activo: boolean;
+}
 export interface Marca {
   IDMarca: number;
   Nombre: string;
@@ -128,6 +136,9 @@ export function atributosDe(variante: Pick<VarianteTienda, 'AtributosJson'>): { 
 export const catalogoService = {
   categorias: (incluirInactivas = false) => obtener<Categoria[]>('/catalogo/categorias', { incluirInactivas: incluirInactivas || undefined }),
   marcas: () => obtener<Marca[]>('/catalogo/marcas'),
+  crearCategoria: (datos: DatosCategoria) => enviar<{ idCategoria: number }>('post', '/catalogo/categorias', datos),
+  editarCategoria: (id: number, datos: DatosCategoria) => enviar<{ idCategoria: number }>('put', `/catalogo/categorias/${id}`, datos),
+  eliminarCategoria: (id: number) => enviar<{ resultado: 'ELIMINADA' | 'DESACTIVADA' }>('delete', `/catalogo/categorias/${id}`),
   atributos: () => obtener<ValorAtributo[]>('/catalogo/atributos'),
   agregarValorAtributo: (idAtributo: number, valor: string) =>
     enviar<{ idValorAtributo: number }>('post', `/catalogo/atributos/${idAtributo}/valores`, { valor }),
