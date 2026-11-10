@@ -124,6 +124,7 @@ function exportarBruno(documento: { paths: Record<string, Record<string, Operaci
   escribir(join(COLECCION, 'collection.bru'), [
     'auth {\n  mode: bearer\n}\n\n',
     'auth:bearer {\n  token: {{accessToken}}\n}\n\n',
+    'vars:pre-request {\n  baseUrl: http://localhost:3000\n}\n\n',
     "script:pre-request {\n  const uuid = 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));\n  bru.setVar('idempotencyKey', uuid);\n}\n",
   ].join(''));
 
