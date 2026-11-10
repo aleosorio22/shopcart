@@ -66,6 +66,13 @@ export interface DetalleProducto {
   especificaciones: Fila[];
 }
 
+export type FormatoImagen = 'jpg' | 'png' | 'webp';
+
+/** Puerto de almacenamiento de archivos: hoy una carpeta local, manana S3 o Azure Blob sin tocar el servicio. */
+export interface AlmacenImagenes {
+  guardar(contenido: Buffer, formato: FormatoImagen): Promise<string>;
+}
+
 export interface CatalogoRepository {
   listarCategorias(incluirInactivas: boolean): Promise<Fila[]>;
   guardarCategoria(actor: number, categoria: Categoria, idCategoria?: number): Promise<number>;

@@ -19,6 +19,8 @@ export interface OpcionesApp {
   routers: ReadonlyArray<{ prefijo: string; router: Router }>;
   verificarSalud: () => Promise<void>;
   limiteGlobalPorMinuto?: number;
+  /** Carpetas servidas tal cual, como las imagenes subidas desde el panel. */
+  estaticos?: ReadonlyArray<{ ruta: string; carpeta: string }>;
 }
 
 /** Quien sufre CSRF es la cookie: se rechaza cualquier escritura desde un origen no permitido. */
@@ -57,7 +59,7 @@ function estadoDeExpress(error: unknown): number | undefined {
   return typeof status === 'number' && status >= 400 && status < 500 ? status : undefined;
 }
 
-export function crearApp({ origenes, proxies, logger, routers, verificarSalud, limiteGlobalPorMinuto = 300 }: OpcionesApp): Express {
+export function crearApp({ origenes, proxies, logger, routers, verificarSalud, limiteGlobalPorMinuto = 300, estaticos = [] }: OpcionesApp): Express {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', proxies);
@@ -79,6 +81,9 @@ export function crearApp({ origenes, proxies, logger, routers, verificarSalud, l
   app.get('/api/openapi.json', (_req, res) => {
     res.json(documentoOpenApi());
   });
+
+  // Sin listado de carpeta ni archivos ocultos; helmet ya envia nosniff para que nada se ejecute como script.
+  for (const { ruta, carpeta } of estaticos) app.use(ruta, express.static(carpeta, { index: false, dotfiles: 'deny', maxAge: '7d', fallthrough: false }));
 
   for (const { prefijo, router } of routers) app.use(prefijo, router);
 

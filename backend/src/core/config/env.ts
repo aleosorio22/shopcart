@@ -23,6 +23,7 @@ const esquema = z.object({
   CORS_ORIGINS: z.string().transform((valor) => valor.split(',').map((origen) => origen.trim()).filter(Boolean)),
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
   JOBS_ENABLED: booleano.default(true),
+  UPLOADS_DIR: z.string().min(1).default('uploads'),
 });
 
 export type Env = z.infer<typeof esquema>;

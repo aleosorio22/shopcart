@@ -1,9 +1,32 @@
 import { AppError } from '../../../core/errors/app-error.js';
 import type { Fila, Pagina } from '../../../core/db/sql-gateway.js';
-import type { Busqueda, Categoria, CatalogoRepository, DetalleProducto, FiltroAdmin, Imagen, Marca, Producto, Variante } from '../domain/catalogo.js';
+import type { AlmacenImagenes, Busqueda, Categoria, CatalogoRepository, FormatoImagen, DetalleProducto, FiltroAdmin, Imagen, Marca, Producto, Variante } from '../domain/catalogo.js';
+
+export const BYTES_MAXIMOS_IMAGEN = 5 * 1024 * 1024;
+
+/** Identifica la imagen por su firma binaria: el nombre y el Content-Type los decide el cliente y no son confiables. */
+export function formatoDeImagen(contenido: Buffer): FormatoImagen | undefined {
+  if (contenido.length >= 3 && contenido[0] === 0xff && contenido[1] === 0xd8 && contenido[2] === 0xff) return 'jpg';
+  if (contenido.length >= 8 && contenido.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'png';
+  if (contenido.length >= 12 && contenido.toString('ascii', 0, 4) === 'RIFF' && contenido.toString('ascii', 8, 12) === 'WEBP') return 'webp';
+  return undefined;
+}
 
 export class CatalogoService {
-  constructor(private readonly repositorio: CatalogoRepository) {}
+  constructor(
+    private readonly repositorio: CatalogoRepository,
+    private readonly almacen: AlmacenImagenes,
+  ) {}
+
+  /** Guarda el archivo y devuelve su URL; luego se asocia al producto con guardarImagen. */
+  async subirImagen(contenido: unknown): Promise<{ url: string }> {
+    const invalido = (mensaje: string) => AppError.datosInvalidos([{ campo: 'archivo', mensaje }]);
+    if (!Buffer.isBuffer(contenido) || contenido.length === 0) throw invalido('Envia una imagen JPG, PNG o WEBP.');
+    if (contenido.length > BYTES_MAXIMOS_IMAGEN) throw invalido('La imagen no puede pesar mas de 5 MB.');
+    const formato = formatoDeImagen(contenido);
+    if (!formato) throw invalido('El archivo no es una imagen JPG, PNG o WEBP valida.');
+    return { url: await this.almacen.guardar(contenido, formato) };
+  }
 
   listarCategorias(incluirInactivas: boolean): Promise<Fila[]> {
     return this.repositorio.listarCategorias(incluirInactivas);

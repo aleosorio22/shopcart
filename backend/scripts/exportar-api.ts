@@ -155,7 +155,7 @@ function exportarBruno(documento: { paths: Record<string, Record<string, Operaci
 }
 
 const db = {} as SqlGateway;
-componer({ db, hasher: new BcryptHasher(4), tokens: new JwtEmisorTokens('x'.repeat(32), 900), pasarela: new PasarelaSimulada(), logger: pino({ level: 'silent' }), diasVidaRefresh: 7, cookieSegura: false });
+componer({ db, hasher: new BcryptHasher(4), tokens: new JwtEmisorTokens('x'.repeat(32), 900), pasarela: new PasarelaSimulada(), logger: pino({ level: 'silent' }), diasVidaRefresh: 7, cookieSegura: false, almacenImagenes: { guardar: async () => '' } });
 
 const documento = documentoOpenApi() as { paths: Record<string, Record<string, Operacion>> };
 escribir(join(SALIDA, 'openapi.yml'), stringify(documento));

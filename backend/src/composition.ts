@@ -14,6 +14,7 @@ import { CarritoSqlRepository } from './modules/carrito/infrastructure/carrito.s
 import { CatalogoService } from './modules/catalogo/application/catalogo.service.js';
 import { rutasCatalogo } from './modules/catalogo/http/catalogo.routes.js';
 import { CatalogoSqlRepository } from './modules/catalogo/infrastructure/catalogo.sql-repository.js';
+import type { AlmacenImagenes } from './modules/catalogo/domain/catalogo.js';
 import { CheckoutService } from './modules/checkout/application/checkout.service.js';
 import type { PasarelaPago } from './modules/checkout/domain/checkout.js';
 import { rutasCheckout } from './modules/checkout/http/checkout.routes.js';
@@ -54,6 +55,7 @@ export interface Dependencias {
   logger: Logger;
   diasVidaRefresh: number;
   cookieSegura: boolean;
+  almacenImagenes: AlmacenImagenes;
   limiteCredenciales?: number;
 }
 
@@ -61,7 +63,7 @@ const limitar = (limit: number): RequestHandler =>
   rateLimit({ windowMs: MINUTO, limit, standardHeaders: 'draft-8', legacyHeaders: false, message: { success: false, error: { codigo: 'DEMASIADAS_SOLICITUDES', mensaje: 'Demasiados intentos. Espere un momento.' } } });
 
 /** Raiz de composicion: el unico lugar que conoce las implementaciones concretas. */
-export function componer({ db, hasher, tokens, pasarela, logger, diasVidaRefresh, cookieSegura, limiteCredenciales = 10 }: Dependencias) {
+export function componer({ db, hasher, tokens, pasarela, logger, diasVidaRefresh, cookieSegura, almacenImagenes, limiteCredenciales = 10 }: Dependencias) {
   const carrito = new CarritoService(new CarritoSqlRepository(db));
   const fusion = {
     // Fallar al unir carritos no debe impedir que alguien entre a su cuenta.
@@ -74,7 +76,7 @@ export function componer({ db, hasher, tokens, pasarela, logger, diasVidaRefresh
     ['/auth', 'Autenticacion', rutasAuth({ servicio: auth, cookieSegura, limitadorCredenciales: limitar(limiteCredenciales), limitadorRefresh: limitar(limiteCredenciales * 3) })],
     ['/usuarios', 'Usuarios', rutasUsuarios(usuarios)],
     ['/clientes', 'Clientes', rutasClientes(new ClientesService(new ClientesSqlRepository(db)))],
-    ['/catalogo', 'Catalogo', rutasCatalogo(new CatalogoService(new CatalogoSqlRepository(db)))],
+    ['/catalogo', 'Catalogo', rutasCatalogo(new CatalogoService(new CatalogoSqlRepository(db), almacenImagenes))],
     ['/inventario', 'Inventario', rutasInventario(new InventarioService(new InventarioSqlRepository(db)))],
     ['/carrito', 'Carrito', rutasCarrito(carrito, cookieSegura)],
     ['/cupones', 'Cupones', rutasCupones(new CuponesService(new CuponesSqlRepository(db)))],

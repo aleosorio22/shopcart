@@ -9,3 +9,6 @@ coverage/
 .vscode/
 .idea/
 .claude/
+
+# Imagenes subidas desde el panel
+backend/uploads/

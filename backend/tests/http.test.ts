@@ -15,11 +15,21 @@ const tokens = new JwtEmisorTokens(SECRETO, 900);
 const PERFIL = 'Api.SP_Seguridad_ObtenerPerfil';
 const LLAVE = '6f1b6b1e-3c5c-4a8e-9d0a-3f2a1c9e7b11';
 
+/** Almacen en memoria: las pruebas no escriben en disco. */
+class AlmacenFalso {
+  readonly guardados: Array<{ bytes: number; formato: string }> = [];
+  async guardar(contenido: Buffer, formato: string): Promise<string> {
+    this.guardados.push({ bytes: contenido.length, formato });
+    return `/uploads/productos/prueba.${formato}`;
+  }
+}
+
 function preparar(permisos: string[] = [], rol = 'CLIENTE') {
   const db = new SqlFalso().responder(PERFIL, [[{ Rol: rol }], permisos.map((Permiso) => ({ Permiso }))]);
-  const { routers } = componer({ db, hasher: new BcryptHasher(4), tokens, pasarela: new PasarelaSimulada(), logger: loggerSilencioso, diasVidaRefresh: 7, cookieSegura: true, limiteCredenciales: 3 });
+  const almacen = new AlmacenFalso();
+  const { routers } = componer({ db, hasher: new BcryptHasher(4), tokens, pasarela: new PasarelaSimulada(), logger: loggerSilencioso, diasVidaRefresh: 7, cookieSegura: true, almacenImagenes: almacen, limiteCredenciales: 3 });
   const app = crearApp({ origenes: [ORIGEN], proxies: 0, logger: loggerSilencioso, routers, verificarSalud: async () => undefined });
-  return { db, app };
+  return { db, app, almacen };
 }
 
 const bearer = (idUsuario = 4) => `Bearer ${tokens.emitir(idUsuario, 'CLIENTE')}`;
@@ -193,5 +203,41 @@ describe('robustez HTTP', () => {
     expect(r.status).toBe(200);
     expect(r.body.paths['/api/v1/checkout/{id}/pagar'].post.parameters.map((p: { name: string }) => p.name)).toContain('Idempotency-Key');
     expect(Object.keys(r.body.paths).length).toBeGreaterThan(50);
+  });
+});
+
+describe('subida de imagenes', () => {
+  const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(32)]);
+  const RUTA = '/api/v1/catalogo/imagenes/archivo';
+
+  it('guarda una imagen valida y devuelve su URL', async () => {
+    const { app, almacen } = preparar(['CATALOGO_GESTIONAR'], 'ADMINISTRADOR');
+    const r = await request(app).post(RUTA).set('Authorization', bearer(2)).set('Origin', ORIGEN).set('Content-Type', 'image/png').send(PNG);
+    expect(r.status).toBe(201);
+    expect(r.body.data.url).toBe('/uploads/productos/prueba.png');
+    expect(almacen.guardados).toEqual([{ bytes: PNG.length, formato: 'png' }]);
+  });
+
+  it('rechaza un archivo que solo dice ser imagen', async () => {
+    const { app, almacen } = preparar(['CATALOGO_GESTIONAR'], 'ADMINISTRADOR');
+    const r = await request(app).post(RUTA).set('Authorization', bearer(2)).set('Origin', ORIGEN).set('Content-Type', 'image/png').send(Buffer.from('<script>alert(1)</script>'));
+    expect(r.status).toBe(400);
+    expect(r.body.error.detalles[0].campo).toBe('archivo');
+    expect(almacen.guardados).toHaveLength(0);
+  });
+
+  it('exige el permiso de catalogo', async () => {
+    const { app, almacen } = preparar();
+    const r = await request(app).post(RUTA).set('Authorization', bearer()).set('Origin', ORIGEN).set('Content-Type', 'image/png').send(PNG);
+    expect(r.status).toBe(403);
+    expect(almacen.guardados).toHaveLength(0);
+  });
+
+  it('rechaza imagenes de mas de 5 MB', async () => {
+    const { app, almacen } = preparar(['CATALOGO_GESTIONAR'], 'ADMINISTRADOR');
+    const grande = Buffer.concat([PNG, Buffer.alloc(5 * 1024 * 1024)]);
+    const r = await request(app).post(RUTA).set('Authorization', bearer(2)).set('Origin', ORIGEN).set('Content-Type', 'image/png').send(grande);
+    expect(r.status).toBe(413);
+    expect(almacen.guardados).toHaveLength(0);
   });
 });

@@ -1,3 +1,4 @@
+import express from 'express';
 import { z } from 'zod';
 import { booleanoQuery, dinero, id, idParam } from '../../../core/http/esquemas.js';
 import { ruta, type RutaDefinida } from '../../../core/http/route.js';
@@ -7,6 +8,8 @@ import { busquedaSchema, categoriaSchema, filtroAdminSchema, imagenSchema, marca
 const CATALOGO = 'CATALOGO_GESTIONAR';
 const PRECIOS = 'PRECIOS_GESTIONAR';
 const varianteParam = z.object({ id, idVariante: id });
+// La imagen viaja como cuerpo binario; solo esta ruta acepta hasta 5 MB.
+const leerImagen = express.raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: '5mb' });
 
 const rutasCategorias = (s: CatalogoService): RutaDefinida[] => [
   ruta({
@@ -40,6 +43,10 @@ const rutasProductos = (s: CatalogoService): RutaDefinida[] => [
   ruta({
     metodo: 'put', ruta: '/productos/:id/variantes/:idVariante', resumen: 'Editar variante', permiso: CATALOGO, params: varianteParam, body: varianteSchema.omit({ precio: true }),
     manejar: ({ idUsuario, params, body }) => s.guardarVariante(idUsuario, params.id, body, params.idVariante),
+  }),
+  ruta({
+    metodo: 'post', ruta: '/imagenes/archivo', resumen: 'Subir un archivo de imagen (cuerpo binario JPG, PNG o WEBP, max. 5 MB); devuelve su URL', permiso: CATALOGO, status: 201,
+    limitador: leerImagen, manejar: ({ req }) => s.subirImagen(req.body),
   }),
   ruta({ metodo: 'post', ruta: '/productos/:id/imagenes', resumen: 'Agregar imagen', permiso: CATALOGO, status: 201, params: idParam, body: imagenSchema, manejar: ({ idUsuario, params, body }) => s.guardarImagen(idUsuario, params.id, body) }),
   ruta({ metodo: 'delete', ruta: '/imagenes/:id', resumen: 'Eliminar imagen', permiso: CATALOGO, status: 204, params: idParam, manejar: ({ idUsuario, params }) => s.eliminarImagen(idUsuario, params.id) }),
