@@ -108,7 +108,7 @@ Para una versión optimizada: `npm run build && npm run preview` (queda en `http
 | `/bolsa` | Todos | Carrito, también de invitado |
 | `/checkout` | Con sesión | Entrega, reserva de 15 minutos y pago |
 | `/cuenta` | Con sesión | Pedidos, seguimiento, direcciones y perfil |
-| `/panel` | Operador y Administrador | Muestra solo las secciones que permite el rol |
+| `/panel` | Operador y Administrador | Muestra solo las secciones que permite el rol. El Administrador gestiona categorías, productos, variantes (con colores o tallas nuevas), precios e imágenes |
 
 ## Credenciales de prueba
 
@@ -329,9 +329,9 @@ flowchart LR
 | Requisito del frontend | Implementación |
 |---|---|
 | Rutas protegidas y menús según el rol | `RutaProtegida` y `MENU_PANEL`: el Operador ve Pedidos, Reembolsos e Inventario; el Administrador, todo |
-| Formularios con validación y errores claros | react-hook-form + zod en registro, direcciones, productos, variantes, cupones, usuarios y movimientos |
+| Formularios con validación y errores claros | react-hook-form + zod en registro, direcciones, categorías, productos, variantes, cupones, usuarios y movimientos |
 | Tablas con paginación, orden y filtros en el servidor | `TablaDatos` en pedidos, productos, existencias, kardex, cupones, usuarios y reembolsos |
-| Gráficas en el dashboard | Recharts: ventas por período, ventas por categoría, más vendidos y margen |
+| Gráficas en el dashboard | Recharts: ventas por período en quetzales y en número de pedidos, ventas por categoría, los 10 más vendidos y margen |
 | Estados de carga, vacío y error | Componente `Consulta` y esqueletos de carga en la tienda |
 | Renovación transparente del token | Interceptor de axios con una sola renovación compartida |
 | Interfaz responsive | Diseño móvil primero; menú lateral del panel en cajón y filtros plegables en el celular |
