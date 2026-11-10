@@ -6,6 +6,10 @@ auth:bearer {
   token: {{accessToken}}
 }
 
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
 script:pre-request {
   const uuid = 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
   bru.setVar('idempotencyKey', uuid);
